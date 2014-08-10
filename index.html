@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script type="text/javascript" src="js/components/mls-validate.js" ></script>
+	</head>
+	<body>
+		<input type="text" id="name"/><span id="name-msg"></span>
+		<input type="text" id="age" /><span id="age-msg"></span>
+		<script>
+		  var v = new Validator();
+		  v.addElement('name').addRules([{require: true},{minLen:5},{maxLen:12},{zc:new RegExp('^zczczc$','g')},{test: function(){return false;}}]).addMessages({require:"shuru",test:'test',minLen:'最短5',maxLen:'最长12',zc:'zcshuru'}).setMessageNode('name-msg').listen('beforeValidate', function(){console.log('beforeValidate')}).afterValidate(function(){console.log('after')});
+		  v.addElement('age').addRules([{min:3}, {max:20}]).addMessages({min:'最小3',max:'最大20'}).setMessageNode('age-msg');
+		</script>
+	</body>
+</html>
