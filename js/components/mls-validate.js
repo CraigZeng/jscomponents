@@ -29,6 +29,49 @@ var Validator = (function(doc){
       }
       utils.addEvent = add;
       add.apply(this, arguments);
+    },
+    series : function(params){
+      var urlArr = [];
+      if(params){
+        for(var k in params){
+          urlArr.push(encodeURIComponent(k) + "=" + encodeURIComponent(params[k]));
+        }
+      }
+      return urlArr.join("&");
+    },
+    ajax : function(url, method, params, fn, sync){
+      var request = (function(){
+        var fns = [
+          function(){ return new XMLHttpRequest() },
+          function(){ return new ActiveXObject('Msxml2.XMLHTTP')},
+          function(){ return new ActiveXObject('Microsoft.XMLHTTP')}
+        ];
+        var i, len = fns.length;
+        for(i = 0; i < len; i++){
+          try{
+            fns[i]();
+            return fns[i];
+          }catch(e){
+            continue;
+          }
+        }
+      })();
+      utils.ajax = function(url, method, params, fn, sync){
+        var req = request();
+        method = method ?  method.toUpperCase() : 'POST';
+        req.onreadystatechange = function(){
+          if(req.readyState === 4 && req.status === 200){
+            fn(new Function('return ' + req.responseText)());
+          }
+        };
+        req.onerror = function(){
+          result = false;
+        };
+        req.open(method, url + (method == 'GET' ? '?' + utils.series(params) : ''), !sync);
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        req.send(method == 'POST' ? utils.series(params) : null);
+      };
+      utils.ajax.apply(this, arguments);
     }
   };
   
@@ -47,6 +90,34 @@ var Validator = (function(doc){
     },
     max : function(val, max){
       return !!val && +val <= max;
+    },
+    depend : function(){
+      return false;
+    },
+    remote : function(val, options){
+      if(options){
+        var params = {}, result = false , fn;
+        if(options.params){
+          if(typeof options.params === 'function'){
+            params = options.params(val);
+          }else{
+            params = options.params;
+          }
+        }
+        fn = function(data){
+          if(data){
+            result = true;
+          }else{
+            result = false;
+          }
+          if(typeof options.callback === 'function'){
+            result = !!options.callback(val);
+          }
+        }
+        utils.ajax(options.url, 'POST', params, fn, true);
+        return result;
+      }
+      return false;
     }
   };
   

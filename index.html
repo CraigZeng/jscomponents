@@ -10,7 +10,7 @@
 		<input type="text" id="age" /><span id="age-msg"></span>
 		<script>
 		  var v = new Validator();
-		  v.addElement('name').addRules([{require: true},{minLen:5},{maxLen:12},{zc:new RegExp('^zczczc$','g')},{test: function(){return false;}}]).addMessages({require:"shuru",test:'test',minLen:'最短5',maxLen:'最长12',zc:'zcshuru'}).setMessageNode('name-msg').listen('beforeValidate', function(){console.log('beforeValidate')}).afterValidate(function(){console.log('after')});
+		  v.addElement('name').addRules([{require: true},{minLen:5},{maxLen:12},{zc:new RegExp('^zczczc$','g')},{test: function(){return true;}},{remote: {url:'http://www.baidu.com',params:{a:1,b:2}}}]).addMessages({require:"shuru",test:'test',minLen:'最短5',maxLen:'最长12',zc:'zcshuru',remote:"name valid"}).setMessageNode('name-msg').listen('beforeValidate', function(){console.log('beforeValidate')}).afterValidate(function(){console.log('after')});
 		  v.addElement('age').addRules([{min:3}, {max:20}]).addMessages({min:'最小3',max:'最大20'}).setMessageNode('age-msg');
 		</script>
 	</body>
