@@ -92,7 +92,7 @@ var Validator = (function(doc){
       return !!val && +val <= max;
     },
     depend : function(){
-      return false;
+      return true;
     },
     remote : function(val, options){
       if(options){
@@ -200,7 +200,12 @@ var Validator = (function(doc){
         for(var o in r){
           fn = r[o];
           if(utils.typeIt(fn) === 'function'){
-            result = fn.call(that, val);
+            if(o === 'depend'){
+              result = fn.call(that, val);
+              if(!result) return true;
+            }else{
+              result = fn.call(that, val);
+            }
           }else if(utils.typeIt(fn) === 'regexp'){
             result = new RegExp(fn).test(val);
           }else{
