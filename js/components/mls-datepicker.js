@@ -29,7 +29,7 @@ var Datepicker = (function(){
                         ele['on' + type] = fn;
                     };
                 }
-                utils.addEvent = add;
+                utils.dom.addEvent = add;
                 add.apply(this, arguments);
             },
             stopPropagation : function(event){
@@ -42,6 +42,18 @@ var Datepicker = (function(){
             },
             hasClass : function(node, cls){
                 return new RegExp('\\s+' + cls + '\\s+').test(' '+ node.className + ' ');
+            },
+            getOffset : function(node){
+                var left = 0, top = 0;
+                while(node){
+                  left = node.offsetLeft + left;
+                  right = node.offsetTop + top;
+                  node = node.offsetParent;
+                }
+                return  {
+                  left : left,
+                  top : top
+                }
             }
         }
     };
@@ -91,6 +103,15 @@ var Datepicker = (function(){
         }
         this.holder.innerHTML = table;
     };
+    
+    var position = function(holder, refNode){
+        var pos = utils.dom.getOffset(refNode);
+        pos.top = refNode.offsetHeight + pos.top;
+        holder.style.position = 'absolute';
+        holder.style.top = pos.top + 'px';
+        holder.style.left = pos.left + 'px';
+        holder.style.display = 'none';
+    };
 
     var init = function(o, options){
         /*
@@ -110,7 +131,6 @@ var Datepicker = (function(){
         o.ele = utils.dom.getNode(options.ele);
         o.listeners = {};
         o.holder = document.createElement('div');
-        o.holder.style.position = "absolute";
         doc.body.appendChild(o.holder);
     };
 
@@ -151,7 +171,12 @@ var Datepicker = (function(){
         //绑定事件
         bindEvent(this);
 
+        //绘制日历控件
         render.call(this);
+        
+        //定位日历控件
+        position(this.holder, this.ele);
+        
     };
 
     datepicker.prototype = {
