@@ -12,19 +12,19 @@ var Datepicker = (function(){
                 var add = null;
                 if (doc.addEventListener) {
                     add = function (ele, type, fn, useCapture) {
-                        ele = utils.getNode(ele);
+                        ele = utils.dom.getNode(ele);
                         type = type.replace(/^on/, '');
                         ele.addEventListener(type, fn, !!useCapture);
                     };
                 } else if (doc.attachEvent) {
                     add = function (ele, type, fn, useCapture) {
-                        ele = utils.getNode(ele);
+                        ele = utils.dom.getNode(ele);
                         type = type.replace(/^on/, '');
                         ele.attachEvent('on' + type, fn);
                     };
                 } else {
                     add = function (ele, type, fn, useCapture) {
-                        ele = utils.getNode(ele);
+                        ele = utils.dom.getNode(ele);
                         type = type.replace(/^on/, '');
                         ele['on' + type] = fn;
                     };
@@ -40,6 +40,14 @@ var Datepicker = (function(){
                     event.cancelBubble = true;
                 }
             },
+            preventDefault: function(event){
+                event = event || window.event;;
+                if(event.preventDefault){
+                    event.preventDefault();
+                } else {
+                   event.returnValue = false;
+                }
+            },
             hasClass : function(node, cls){
                 return new RegExp('\\s+' + cls + '\\s+').test(' '+ node.className + ' ');
             },
@@ -47,7 +55,7 @@ var Datepicker = (function(){
                 var left = 0, top = 0;
                 while(node){
                   left = node.offsetLeft + left;
-                  right = node.offsetTop + top;
+                  top = node.offsetTop + top;
                   node = node.offsetParent;
                 }
                 return  {
@@ -134,17 +142,25 @@ var Datepicker = (function(){
         doc.body.appendChild(o.holder);
     };
 
+    var updateSelected = function(year, month, day){
+        if(!this.selected){ this.selected = new Date();}
+        this.selected.setMonth(month);
+        this.selected.setDate(day);
+        this.selected.setYear(year);
+    };
+
     var bindEvent = function(o){
-        utils.dom.addEvent(document, 'click', function(){
+        utils.dom.addEvent(doc, 'click', function(){
             o.hide();
         });
 
         utils.dom.addEvent(o.holder, 'click', function(event){
             var target = event.target || event.srcElement;
             var day;
+            console.log("ss")
             if(!utils.dom.hasClass(target, 'cal-disabled')){
                day = +target.innerHTML;
-               o.selected.setDate(day);
+               updateSelected.call(o, o.date.getFullYear(), o.date.getMonth(), day);
                target.className = 'cal-selected';
                o.hide();
                o.fire('selected', o.selected);
@@ -153,6 +169,11 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.ele, 'mousedown', function(event){
+            o.show();
+            utils.dom.stopPropagation(event);
+        });
+
+        utils.dom.addEvent(o.ele, 'click', function(event){
             o.show();
             utils.dom.stopPropagation(event);
         });
