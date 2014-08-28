@@ -3,7 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<title></title>
+		<link rel="stylesheet" type="text/css" href="datepicker.css" />
 		<script type="text/javascript" src="js/components/mls-validate.js" ></script>
+		<script type="text/javascript" src="js/components/mls-datepicker.js"></script>
 	</head>
 	<body>
 		<input type="text" id="name"/><span id="name-msg"></span>
@@ -12,6 +14,12 @@
 		  var v = new Validator();
 		  v.addElement('name').addRules([{require: true},{minLen:5},{maxLen:12},{zc:new RegExp('^zczczc$','g')},{test: function(){return true;}},{remote: {url:'http://www.baidu.com',params:{a:1,b:2}}}]).addMessages({require:"shuru",test:'test',minLen:'最短5',maxLen:'最长12',zc:'zcshuru',remote:"name valid"}).setMessageNode('name-msg').listen('beforeValidate', function(){console.log('beforeValidate')}).afterValidate(function(){console.log('after')});
 		  v.addElement('age').addRules([{min:3}, {max:20}]).addMessages({min:'最小3',max:'最大20'}).setMessageNode('age-msg');
+		</script>
+		<input type="text" id="startTime"/>
+		<script type="text/javascript">
+		   var start = new Datepicker({
+		   	   ele : "startTime"
+		   })
 		</script>
 	</body>
 </html>

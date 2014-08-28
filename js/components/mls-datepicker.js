@@ -1,8 +1,12 @@
 var Datepicker = (function(){
     "use strict";
-    var WEEK = "";
     var doc = document;
-
+    var VIEW = {
+        "month": 1,
+        "day" : 2
+    };
+    var MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var WEEKEND_NAMES = ["日","一","二","三","四","五","六"];
     var utils = {
         dom : {
             getNode : function (ele) {
@@ -66,11 +70,19 @@ var Datepicker = (function(){
         }
     };
 
+    var renderWeekHead = function(){
+        var tr = '<tr><td class="cal-header-weekend">' + WEEKEND_NAMES[0] + '</td>', i;
+        for(i = 1; i < 6; i++){
+            tr = tr + '<td class="cal-header-day">' + WEEKEND_NAMES[i] + '</td>';
+        }
+        return tr + '<td class="cal-header-weekend">' + WEEKEND_NAMES[6] + '</td></tr>';
+    }
+
     var renderDate = function(){
         var currentDate = this.date, i;
         var year = currentDate.getFullYear();
         var month = currentDate.getMonth(), day = currentDate.getDate();
-        var table = '<table><tr><td>日</td><td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr>';
+        var table = '<table>' + renderWeekHead();
         var firstDayOfMonth = new Date(year, month, 1);
         var lastDayOfMonth = new Date(year, month+1, 0);
         var emptyFirstTD = firstDayOfMonth.getDay(), emptyLastTD = lastDayOfMonth.getDay();
@@ -81,11 +93,12 @@ var Datepicker = (function(){
         for(start = startDate - emptyFirstTD, end = endDate + 6 - emptyLastTD;start <= end ;){
             tr = '<tr>';
             for (i = 0; i < 7; i++) {
-                tdCls = 'cal-default';
+                tdCls = '';
                 if (start >= startDate && start <= endDate) {
-                    if(hilightSelected && start === selectedDate){ tdCls = 'cal-selected'; }
-                    if(weekend%7 === 0 || weekend%7 === 6 ){ tdCls = 'cal-weekend'; }
-                    if(!this.limit(year, month, start)){ tdCls = tdCls + ' cal-disabled';}
+                    tdCls = 'cal-day';
+                    if(hilightSelected && start === selectedDate){ tdCls += ' cal-selected'; }
+                    if(weekend%7 === 0 || weekend%7 === 6 ){ tdCls += ' cal-weekend'; }
+                    if(!this.limit(year, month, start)){ tdCls += ' cal-disabled';}
                     tr = tr + '<td class="' + tdCls +'">' + start + '</td>';
                 } else {
                     tr = tr + '<td class="' + tdCls + '"></td>';
@@ -100,16 +113,55 @@ var Datepicker = (function(){
         return table;
     };
 
+    var renderHead = function(viewModel){
+        var currentDate = this.date;
+        var year = currentDate.getFullYear(),
+            month = currentDate.getMonth() + 1;
+        var text =  viewModel == VIEW.day ? year + "年" + (month<10 ? '0' + month : month) + "月" : year + "年";
+        var head = '<div class="cal-header">' +
+                        '<span class="cal-prev">&lt;</span>' + 
+                        '<span class="cal-date-text">' +  text + '</span>' + 
+                        '<span class="cal-next">&gt;</span>' +
+                   '</div>';
+        return head;
+    };
+
+    var renderMonth = function(){
+        var currentDate = this.date;
+        var table = '<table>', 
+            month = this.date.getMonth(),
+            tr, i, j, cls;
+        var currentMonth = 0;
+        for(i = 0; i < 3; i++){
+            tr = '<tr>';
+            for(j = 0; j < 4; j++){
+                currentMonth = i * 4 + j;
+                cls = 'cal-month';
+                cls = cls + (month == currentMonth ? ' cal-selected' : '');
+                tr = tr + '<td class="' + cls + '" data-month="' + currentMonth + '">' + MONTH_NAMES[currentMonth]+ '</td>';
+            }
+            tr = tr + '</tr>';
+            table = table + tr;
+        }
+        table = table + '</table>';
+        return table;
+    };
+
     var renderTime = function(){
 
     };
 
     var render = function(){
-        var table = renderDate.call(this), time;
-        if(this.hasTime){
-            time = renderTime.call(this);
-        }
-        this.holder.innerHTML = table;
+        var tableDay = renderDate.call(this),
+            headDay = renderHead.call(this,VIEW.day),
+            headMonth = renderHead.call(this,VIEW.month),
+            tableMonth = renderMonth.call(this),
+            time;
+        this.holder.className = 'calendar'
+        this.holder.innerHTML = '<div class="cal-day-view">' + headDay + tableDay + '</div>'+
+                                '<div class="cal-month-view" style="display:none">' + headMonth + tableMonth + '</div>';
+        this.dayHolder = this.holder.firstChild;
+        this.monHolder = this.holder.lastChild;
     };
     
     var position = function(holder, refNode){
@@ -126,14 +178,14 @@ var Datepicker = (function(){
          * 初始化参数
          * date 当前显示的月份
          * selected 选中的日期
-         * state 0表示隐藏 1表示显示
+         * viewModel 1表示天 2表示月
          * hasTime true表示显示时分秒 false表示不显示时分秒
          * limit 在渲染日期时的判断条件 返回true表示可选 返回false不可选
          * ele 绑定的input元素
          */
         o.date = options.date || new Date();
         o.selected = options.selected || null;
-        o.state = 0;
+        o.viewModel = VIEW.day;
         o.hasTime = options.hasTime || false;
         o.limit = options.limit || function(){ return true;};
         o.ele = utils.dom.getNode(options.ele);
@@ -154,16 +206,55 @@ var Datepicker = (function(){
             o.hide();
         });
 
-        utils.dom.addEvent(o.holder, 'click', function(event){
+        utils.dom.addEvent(o.holder, 'selectstart', function(event){
+            utils.dom.preventDefault(event);
+        });
+
+        utils.dom.addEvent(o.dayHolder, 'click', function(event){
             var target = event.target || event.srcElement;
             var day;
-            console.log("ss")
             if(!utils.dom.hasClass(target, 'cal-disabled')){
-               day = +target.innerHTML;
-               updateSelected.call(o, o.date.getFullYear(), o.date.getMonth(), day);
-               target.className = 'cal-selected';
-               o.hide();
-               o.fire('selected', o.selected);
+               if(utils.dom.hasClass(target, 'cal-day')){
+                   day = +target.innerHTML;
+                   updateSelected.call(o, o.date.getFullYear(), o.date.getMonth(), day);
+                   o.fire('selected', o.selected);
+                   o.hide();
+                   o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
+               }else if(utils.dom.hasClass(target, 'cal-prev')){
+                   o.date.setMonth(o.date.getMonth()-1);
+                   o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
+               }else if(utils.dom.hasClass(target, 'cal-next')){
+                   o.date.setMonth(o.date.getMonth()+1);
+                   o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
+               }else if(utils.dom.hasClass(target, 'cal-date-text')){
+                   o.viewModel = VIEW.month;
+                   o.monHolder.innerHTML = renderHead.call(o, VIEW.month) + renderMonth.call(o);
+                   o.dayHolder.style.display = 'none';
+                   o.monHolder.style.display = 'block';    
+               }
+            }
+            utils.dom.stopPropagation(event);
+        });
+
+        utils.dom.addEvent(o.monHolder, 'click', function(event){
+            var target = event.target || event.srcElement;
+            var month;
+            if(!utils.dom.hasClass(target, 'cal-disabled')){
+               if(utils.dom.hasClass(target, 'cal-month')){
+                   month = target.getAttribute('data-month');
+                   target.className = 'cal-month cal-selected';
+                   o.date.setMonth(month);
+                   o.viewModel = VIEW.day;
+                   o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
+                   o.monHolder.style.display = 'none';
+                   o.dayHolder.style.display = 'block'; 
+               }else if(utils.dom.hasClass(target, 'cal-prev')){
+                   o.date.setYear(o.date.getFullYear()-1);
+                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.date.getFullYear() + '年';
+               }else if(utils.dom.hasClass(target, 'cal-next')){
+                   o.date.setYear(o.date.getFullYear()+1);
+                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.date.getFullYear() + '年';
+               }
             }
             utils.dom.stopPropagation(event);
         });
@@ -189,11 +280,11 @@ var Datepicker = (function(){
         //初始化
         init(this, options);
 
-        //绑定事件
-        bindEvent(this);
-
         //绘制日历控件
         render.call(this);
+
+        //绑定事件
+        bindEvent(this);
         
         //定位日历控件
         position(this.holder, this.ele);
