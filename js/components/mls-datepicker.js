@@ -67,6 +67,83 @@ var Datepicker = (function(){
                   top : top
                 }
             }
+        },
+        date : {
+            formatDate2Str : function(d, pattern){
+                if (!pattern) {
+                    pattern = 'yyyy-MM-dd';
+                }
+
+                function replacer(patternPart, result) {
+                    pattern = pattern.replace(patternPart, result);
+                }
+
+                var pad = function (source, length) {
+                    var pre = "",
+                        negative = (source < 0),
+                        string = String(Math.abs(source));
+
+                    if (string.length < length) {
+                        pre = (new Array(length - string.length + 1)).join('0');
+                    }
+
+                    return (negative ? "-" : "") + pre + string;
+                };
+
+                var year = d.getFullYear(),
+                    month = d.getMonth() + 1,
+                    date2 = d.getDate(),
+                    hours = d.getHours(),
+                    minutes = d.getMinutes(),
+                    seconds = d.getSeconds();
+
+                replacer(/yyyy/g, pad(year, 4));
+                replacer(/yy/g, pad(parseInt(year.toString().slice(2), 10), 2));
+                replacer(/MM/g, pad(month, 2));
+                replacer(/M/g, month);
+                replacer(/dd/g, pad(date2, 2));
+                replacer(/d/g, date2);
+
+                replacer(/HH/g, pad(hours, 2));
+                replacer(/H/g, hours);
+                replacer(/hh/g, pad(hours % 12, 2));
+                replacer(/h/g, hours % 12);
+                replacer(/mm/g, pad(minutes, 2));
+                replacer(/m/g, minutes);
+                replacer(/ss/g, pad(seconds, 2));
+                replacer(/s/g, seconds);
+
+                return pattern;
+            },
+            formatStr2Date : function(d, pattern){
+                var dateObj , date = new Date(), i;
+                dateObj = {
+                    year : date.getYear(),
+                    month : date.getMonth()+1,
+                    day : date.getDate(),
+                    hour : date.getHours(),
+                    minute : date.getMinutes(),
+                    second : date.getSeconds(),
+                    millseconds : 0
+                };
+                var repl = function(key){
+                    return function(match, start){
+                        var value = d.substr(start, match.length);
+                        dateObj[key] = value;
+                        return match;
+                    }
+                }
+                pattern.replace(/[Yy]{2,}/g,repl('year'))
+                      .replace(/M+/g, repl('month'))
+                      .replace(/[Dd]+/g, repl('day'))
+                      .replace(/H+/g, repl('hour'))
+                      .replace(/m+/g, repl('minute'))
+                      .replace(/s+/g, repl('second'));
+                if(dateObj.year.length < 4){ dateObj.year = date.getFullYear().toString().slice(0,2) + '' + dateObj.year}
+                return new Date(dateObj.year, dateObj.month-1, dateObj.day, dateObj.hour, dateObj.minute, dateObj.second, dateObj.millseconds);
+   
+            }
+
         }
     };
 
@@ -163,6 +240,12 @@ var Datepicker = (function(){
         this.dayHolder = this.holder.firstChild;
         this.monHolder = this.holder.lastChild;
     };
+
+    var updateInput = function(){
+        if(this.selected){
+            this.ele.value = utils.date.formatDate2Str(this.selected, this.format);
+        }
+    };
     
     var position = function(holder, refNode){
         var pos = utils.dom.getOffset(refNode);
@@ -170,7 +253,6 @@ var Datepicker = (function(){
         holder.style.position = 'absolute';
         holder.style.top = pos.top + 'px';
         holder.style.left = pos.left + 'px';
-        holder.style.display = 'none';
     };
 
     var init = function(o, options){
@@ -184,6 +266,7 @@ var Datepicker = (function(){
          * ele 绑定的input元素
          */
         o.date = options.date || new Date();
+        o.format = options.format || 'yyyy-MM-dd'
         o.selected = options.selected || null;
         o.viewModel = VIEW.day;
         o.hasTime = options.hasTime || false;
@@ -191,6 +274,7 @@ var Datepicker = (function(){
         o.ele = utils.dom.getNode(options.ele);
         o.listeners = {};
         o.holder = document.createElement('div');
+        o.holder.style.display = 'none';
         doc.body.appendChild(o.holder);
     };
 
@@ -217,6 +301,7 @@ var Datepicker = (function(){
                if(utils.dom.hasClass(target, 'cal-day')){
                    day = +target.innerHTML;
                    updateSelected.call(o, o.date.getFullYear(), o.date.getMonth(), day);
+                   updateInput.call(o);
                    o.fire('selected', o.selected);
                    o.hide();
                    o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
@@ -260,11 +345,13 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.ele, 'mousedown', function(event){
+            position(o.holder, o.ele);
             o.show();
             utils.dom.stopPropagation(event);
         });
 
         utils.dom.addEvent(o.ele, 'click', function(event){
+            position(o.holder, o.ele);
             o.show();
             utils.dom.stopPropagation(event);
         });
@@ -315,16 +402,6 @@ var Datepicker = (function(){
         },
         select : function(selectedDate){
             this.selected = selectedDate || new Date();
-            render.call(this);
-        },
-        nextMonth : function(){
-            var month = this.date.getMonth();
-            this.date.setMonth(month+1);
-            render.call(this);
-        },
-        prevMonth : function(){
-            var month = this.date.getMonth();
-            this.date.setMonth(month-1);
             render.call(this);
         }
     };

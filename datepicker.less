@@ -1,5 +1,6 @@
 @theme-color:#f69;
-@gray:#999; 
+@gray:#999;
+@disable-color:#aaa;
 .calendar{
 	border: solid 2px desaturate(@theme-color, 50%);
 	.cal-header{
@@ -40,11 +41,12 @@
     	text-align: center;
     	background-color: #fff;
     	cursor: pointer;
+    	border-radius: 5px;
 	   	&:hover,&.cal-selected{
 			background-color: @theme-color;
 			color: #fff;
-			border-radius: 5px;
 			&.cal-disabled{
+				color: @disable-color;
 				background-color: @gray;
 				cursor: not-allowed;
 			}
@@ -54,6 +56,7 @@
 				background-color: @gray;
 			    cursor: not-allowed;
 			}
+			color: @disable-color;
 			background-color: @gray;
 			cursor: not-allowed;
 		}
@@ -62,6 +65,11 @@
 			    border-radius: 5px;	
 				background-color: @theme-color;
 			    color: #fff;
+			}
+			&.cal-disabled{
+				background-color: @gray;
+			    cursor: not-allowed;
+			    color: @disable-color;
 			}
 			color: @theme-color;
 			background-color: #fff;

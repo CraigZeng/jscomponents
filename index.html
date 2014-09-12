@@ -18,7 +18,10 @@
 		<input type="text" id="startTime"/>
 		<script type="text/javascript">
 		   var start = new Datepicker({
-		   	   ele : "startTime"
+		   	   ele : "startTime",
+		   	   limit : function(year, month, day){
+		   	   	   return day > 10;
+		   	   }
 		   })
 		</script>
 	</body>
