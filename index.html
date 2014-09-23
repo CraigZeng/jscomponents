@@ -15,14 +15,30 @@
 		  v.addElement('name').addRules([{require: true},{minLen:5},{maxLen:12},{zc:new RegExp('^zczczc$','g')},{test: function(){return true;}},{remote: {url:'http://www.baidu.com',params:{a:1,b:2}}}]).addMessages({require:"shuru",test:'test',minLen:'最短5',maxLen:'最长12',zc:'zcshuru',remote:"name valid"}).setMessageNode('name-msg').listen('beforeValidate', function(){console.log('beforeValidate')}).afterValidate(function(){console.log('after')});
 		  v.addElement('age').addRules([{min:3}, {max:20}]).addMessages({min:'最小3',max:'最大20'}).setMessageNode('age-msg');
 		</script>
+		<br/>
 		<input type="text" id="startTime"/>
+		<input type="text" id="endTime"/>
 		<script type="text/javascript">
-		   var start = new Datepicker({
+		    var start = new Datepicker({
 		   	   ele : "startTime",
 		   	   limit : function(year, month, day){
-		   	   	   return day > 10;
+		   	   	   var now = new Date();
+		   	   	   return year > now.getFullYear() || month > now.getMonth() || (year == now.getFullYear() && month == now.getMonth() && day >= now.getDate()) || false
 		   	   }
-		   })
+		    });
+
+		    var end = new Datepicker({
+		   	   ele : "endTime",
+		   	   limit : function(year, month, day){
+		   	   	   var now = start.getVal();
+		   	   	   return year > now.getFullYear() || (year == now.getFullYear() && month > now.getMonth()) || (year == now.getFullYear() && month == now.getMonth() && day >= now.getDate()) || false
+		   	   }
+		    });
+
+		    start.listen('selected', function(){
+		    	end.refresh();
+		    });
+
 		</script>
 	</body>
 </html>

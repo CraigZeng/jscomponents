@@ -1,13 +1,38 @@
 @theme-color:#f69;
-@gray:#999;
+@gray:#ccc;
 @disable-color:#aaa;
 .calendar{
-	border: solid 2px desaturate(@theme-color, 50%);
+	border: solid 2px desaturate(@theme-color, 30%);
+	&:before{
+		content: '';
+		display: block;
+		position: absolute;
+		border-top: none;
+		border-bottom: solid 12px desaturate(@theme-color, 30%);
+		border-left: solid 12px transparent;
+		border-right: solid 12px transparent;
+		z-index: 10;
+		left: 5px;
+		top: -12px;
+	}
+	&:after{
+		content: '';
+		display: block;
+		position: absolute;
+		border-top: none;
+		border-bottom: solid 12px #fff;
+		border-left: solid 12px transparent;
+		border-right: solid 12px transparent;
+		z-index: 100;
+		left: 5px;
+		top: -10px;
+	}
 	.cal-header{
 		margin: 5px 0;
 		text-align: center;
 		overflow: hidden;
 		border-bottom: solid 1px desaturate(@theme-color, 30%);
+		color: @theme-color;
 		.cal-prev,.cal-next{
 			display: inline-block;
 			cursor: pointer;
@@ -42,6 +67,9 @@
     	background-color: #fff;
     	cursor: pointer;
     	border-radius: 5px;
+    	&.cal-prev-month-day,&.cal-next-month-day{
+    		color: #aaa;
+    	}
 	   	&:hover,&.cal-selected{
 			background-color: @theme-color;
 			color: #fff;

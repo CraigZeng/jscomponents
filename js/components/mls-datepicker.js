@@ -140,10 +140,8 @@ var Datepicker = (function(){
                       .replace(/m+/g, repl('minute'))
                       .replace(/s+/g, repl('second'));
                 if(dateObj.year.length < 4){ dateObj.year = date.getFullYear().toString().slice(0,2) + '' + dateObj.year}
-                return new Date(dateObj.year, dateObj.month-1, dateObj.day, dateObj.hour, dateObj.minute, dateObj.second, dateObj.millseconds);
-   
+                return new Date(dateObj.year, dateObj.month-1, dateObj.day, dateObj.hour, dateObj.minute, dateObj.second, dateObj.millseconds); 
             }
-
         }
     };
 
@@ -162,23 +160,28 @@ var Datepicker = (function(){
         var table = '<table>' + renderWeekHead();
         var firstDayOfMonth = new Date(year, month, 1);
         var lastDayOfMonth = new Date(year, month+1, 0);
+        var lastDayofLastMonth = new Date(year, month, 0);
+        var firstDayOfNextMonth = new Date(year, month+1, 1);
         var emptyFirstTD = firstDayOfMonth.getDay(), emptyLastTD = lastDayOfMonth.getDay();
         var startDate = 1, endDate = lastDayOfMonth.getDate();
         var tr = '', start, end, tdCls, weekend = 0;
         var selectedDate = this.selected ? this.selected.getDate() : 100;
         var hilightSelected = (this.selected && this.selected.getFullYear() === this.date.getFullYear() && this.selected.getMonth() === this.date.getMonth()) ? true : false;
-        for(start = startDate - emptyFirstTD, end = endDate + 6 - emptyLastTD;start <= end ;){
+        for(start = startDate - emptyFirstTD, end = endDate + 6 - emptyLastTD; start <= end ;){
             tr = '<tr>';
             for (i = 0; i < 7; i++) {
-                tdCls = '';
+                tdCls = 'cal-day';
                 if (start >= startDate && start <= endDate) {
-                    tdCls = 'cal-day';
                     if(hilightSelected && start === selectedDate){ tdCls += ' cal-selected'; }
                     if(weekend%7 === 0 || weekend%7 === 6 ){ tdCls += ' cal-weekend'; }
                     if(!this.limit(year, month, start)){ tdCls += ' cal-disabled';}
                     tr = tr + '<td class="' + tdCls +'">' + start + '</td>';
+                } else if(start < startDate){
+                    if(!this.limit(lastDayofLastMonth.getFullYear(), lastDayofLastMonth.getMonth(), lastDayofLastMonth.getDate() + start)){ tdCls += ' cal-disabled';}
+                    tr = tr + '<td class="' + tdCls + ' cal-prev-month-day">' + (lastDayofLastMonth.getDate() + start) + '</td>';
                 } else {
-                    tr = tr + '<td class="' + tdCls + '"></td>';
+                    if(!this.limit(firstDayOfNextMonth.getFullYear(), firstDayOfNextMonth.getMonth(), start - endDate)){ tdCls += ' cal-disabled';}
+                    tr = tr + '<td class="' + tdCls + ' cal-next-month-day">' + (start - endDate) + '</td>';
                 }
                 start++;
                 weekend++;
@@ -251,7 +254,7 @@ var Datepicker = (function(){
         var pos = utils.dom.getOffset(refNode);
         pos.top = refNode.offsetHeight + pos.top;
         holder.style.position = 'absolute';
-        holder.style.top = pos.top + 'px';
+        holder.style.top = (pos.top + 8)+ 'px';
         holder.style.left = pos.left + 'px';
     };
 
@@ -296,11 +299,21 @@ var Datepicker = (function(){
 
         utils.dom.addEvent(o.dayHolder, 'click', function(event){
             var target = event.target || event.srcElement;
-            var day;
+            var day, month;
             if(!utils.dom.hasClass(target, 'cal-disabled')){
                if(utils.dom.hasClass(target, 'cal-day')){
                    day = +target.innerHTML;
-                   updateSelected.call(o, o.date.getFullYear(), o.date.getMonth(), day);
+                   month = o.date.getMonth();
+                   if (utils.dom.hasClass(target, 'cal-prev-month-day')) {
+                       month = month - 1;
+                       o.date.setDate(1);
+                       o.date.setMonth(month);
+                   } else if(utils.dom.hasClass(target, 'cal-next-month-day')) {
+                       month = month + 1;
+                       o.date.setDate(1);
+                       o.date.setMonth(month);
+                   }
+                   updateSelected.call(o, o.date.getFullYear(), month, day);
                    updateInput.call(o);
                    o.fire('selected', o.selected);
                    o.hide();
@@ -400,10 +413,18 @@ var Datepicker = (function(){
         hide : function(){
             this.holder.style.display = 'none';
         },
+        refresh : function(){
+            this.dayHolder.innerHTML = renderHead.call(this, VIEW.day) + renderDate.call(this);
+        },
         select : function(selectedDate){
             this.selected = selectedDate || new Date();
             render.call(this);
+        },
+        getVal : function(){
+            return this.selected || new Date();
         }
     };
+
+    datepicker.utils = utils;
     return datepicker;
 })();
