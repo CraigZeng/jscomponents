@@ -197,11 +197,11 @@ var Datepicker = (function(){
         var currentDate = this.date;
         var year = currentDate.getFullYear(),
             month = currentDate.getMonth() + 1;
-        var text =  viewModel == VIEW.day ? year + "年" + (month<10 ? '0' + month : month) + "月" : year + "年";
+        var text =  viewModel == VIEW.day ? year + "-" + (month<10 ? '0' + month : month) : year ;
         var head = '<div class="cal-header">' +
                         '<span class="cal-prev">&lt;</span>' + 
-                        '<span class="cal-date-text">' +  text + '</span>' + 
                         '<span class="cal-next">&gt;</span>' +
+                        '<span class="cal-date-text">' +  text + '</span>' + 
                    '</div>';
         return head;
     };

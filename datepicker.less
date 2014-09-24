@@ -1,43 +1,51 @@
-@theme-color:#f69;
+@theme-color:#ff8fb5;
+@theme-text-color:#dc4651;
 @gray:#ccc;
 @disable-color:#aaa;
 .calendar{
-	border: solid 2px desaturate(@theme-color, 30%);
+	box-sizing: border-box;
+	border: solid 1px #fee;
+	width: 230px;
 	&:before{
 		content: '';
 		display: block;
 		position: absolute;
 		border-top: none;
-		border-bottom: solid 12px desaturate(@theme-color, 30%);
-		border-left: solid 12px transparent;
-		border-right: solid 12px transparent;
+		border-bottom: solid 8px desaturate(@theme-color, 30%);
+		border-left: solid 8px transparent;
+		border-right: solid 8px transparent;
 		z-index: 10;
 		left: 5px;
-		top: -12px;
+		top: -8px;
 	}
 	&:after{
 		content: '';
 		display: block;
 		position: absolute;
 		border-top: none;
-		border-bottom: solid 12px #fff;
-		border-left: solid 12px transparent;
-		border-right: solid 12px transparent;
+		border-bottom: solid 8px #ff8fb5;
+		border-left: solid 8px transparent;
+		border-right: solid 8px transparent;
 		z-index: 100;
 		left: 5px;
-		top: -10px;
+		top: -7px;
+	}
+	table{
+		width: 100%;
 	}
 	.cal-header{
-		margin: 5px 0;
 		text-align: center;
 		overflow: hidden;
-		border-bottom: solid 1px desaturate(@theme-color, 30%);
-		color: @theme-color;
+		height: 50px;
+		font-size: 20px;
+		background-color: @theme-color;
+		color: @theme-text-color;
 		.cal-prev,.cal-next{
-			display: inline-block;
+			display: block;
 			cursor: pointer;
-			padding: 5px 30px;
 			font-weight: bold;
+			width: 45px;
+			line-height: 50px;
 		}
 		.cal-prev{
 			float: left;
@@ -46,10 +54,10 @@
 			float: right;
 		}
 		.cal-date-text{
-			height: 26px;
-			line-height: 26px;
-			display: inline-block;
+			display: block;
 			cursor: pointer;
+			margin: 0 45px;
+			line-height: 50px;
 		}
 	}
 	.cal-header-day{
