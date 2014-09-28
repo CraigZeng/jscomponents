@@ -146,18 +146,24 @@ var Datepicker = (function(){
     };
 
     var renderWeekHead = function(){
-        var tr = '<tr><td class="cal-header-weekend">' + WEEKEND_NAMES[0] + '</td>', i;
+        var tr = '<tr><th class="cal-header-weekend">' + WEEKEND_NAMES[0] + '</th>', i;
         for(i = 1; i < 6; i++){
-            tr = tr + '<td class="cal-header-day">' + WEEKEND_NAMES[i] + '</td>';
+            tr = tr + '<th class="cal-header-day">' + WEEKEND_NAMES[i] + '</th>';
         }
-        return tr + '<td class="cal-header-weekend">' + WEEKEND_NAMES[6] + '</td></tr>';
-    }
+        return tr + '<th class="cal-header-weekend">' + WEEKEND_NAMES[6] + '</th></tr>';
+    };
+
+    var renderTime = function(){
+        var wrap = '<div class="cal-hours">';
+        wrap = wrap + '<span contentEditable="true" class="underline-editor"></span>:<span contentEditable="true" class="underline-editor"></span>:<span contentEditable="true" class="underline-editor"></span>'
+        return wrap + '</div>';
+    };
 
     var renderDate = function(){
         var currentDate = this.date, i;
         var year = currentDate.getFullYear();
         var month = currentDate.getMonth(), day = currentDate.getDate();
-        var table = '<table>' + renderWeekHead();
+        var table = '<table><thead>' + renderWeekHead() + '</thead>';
         var firstDayOfMonth = new Date(year, month, 1);
         var lastDayOfMonth = new Date(year, month+1, 0);
         var lastDayofLastMonth = new Date(year, month, 0);
@@ -190,6 +196,7 @@ var Datepicker = (function(){
             table = table + tr;
         }
         table = table + '</table>';
+        table = table + renderTime.call(this);
         return table;
     };
 
@@ -227,16 +234,11 @@ var Datepicker = (function(){
         return table;
     };
 
-    var renderTime = function(){
-
-    };
-
     var render = function(){
         var tableDay = renderDate.call(this),
             headDay = renderHead.call(this,VIEW.day),
             headMonth = renderHead.call(this,VIEW.month),
-            tableMonth = renderMonth.call(this),
-            time;
+            tableMonth = renderMonth.call(this);
         this.holder.className = 'calendar'
         this.holder.innerHTML = '<div class="cal-day-view">' + headDay + tableDay + '</div>'+
                                 '<div class="cal-month-view" style="display:none">' + headMonth + tableMonth + '</div>';
@@ -294,7 +296,9 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.holder, 'selectstart', function(event){
-            utils.dom.preventDefault(event);
+            if(!utils.dom.hasClass(target, 'underline-editor')){
+                utils.dom.preventDefault(event);
+            }
         });
 
         utils.dom.addEvent(o.dayHolder, 'click', function(event){
@@ -329,6 +333,8 @@ var Datepicker = (function(){
                    o.monHolder.innerHTML = renderHead.call(o, VIEW.month) + renderMonth.call(o);
                    o.dayHolder.style.display = 'none';
                    o.monHolder.style.display = 'block';    
+               } else if(utils.dom.hasClass(target, 'underline-editor')){
+                   
                }
             }
             utils.dom.stopPropagation(event);

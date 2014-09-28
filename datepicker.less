@@ -1,11 +1,13 @@
 @theme-color:#ff8fb5;
 @theme-text-color:#dc4651;
-@gray:#ccc;
+@default-color:#555;
 @disable-color:#aaa;
 .calendar{
 	box-sizing: border-box;
-	border: solid 1px #fee;
+	border: solid 1px desaturate(@theme-color, 30%);
 	width: 230px;
+	font-size: 14px;
+	color: @default-color;
 	&:before{
 		content: '';
 		display: block;
@@ -60,14 +62,12 @@
 			line-height: 50px;
 		}
 	}
-	.cal-header-day{
-		background-color: #fff;
+	.cal-header-day,.cal-header-weekend{
 		text-align: center;
-	}
-	.cal-header-weekend{
-		text-align: center;
-		color: @theme-color;
 		background-color: #fff;
+		font-weight: bold;
+		height: 26px;
+		line-height: 26px;
 	}
     .cal-day, .cal-month{
     	padding: 6px;
@@ -75,48 +75,37 @@
     	background-color: #fff;
     	cursor: pointer;
     	border-radius: 5px;
-    	&.cal-prev-month-day,&.cal-next-month-day{
-    		color: #aaa;
-    	}
 	   	&:hover,&.cal-selected{
-			background-color: @theme-color;
+	   		background-color:  @theme-color;
 			color: #fff;
 			&.cal-disabled{
 				color: @disable-color;
-				background-color: @gray;
 				cursor: not-allowed;
+				background-color: #fff;
 			}
 		}
 		&.cal-disabled{
 			&:hover{
-				background-color: @gray;
+				color: @disable-color;
 			    cursor: not-allowed;
 			}
 			color: @disable-color;
-			background-color: @gray;
 			cursor: not-allowed;
 		}
-		&.cal-weekend{
-			&:hover,&.cal-selected{
-			    border-radius: 5px;	
-				background-color: @theme-color;
-			    color: #fff;
-			}
-			&.cal-disabled{
-				background-color: @gray;
-			    cursor: not-allowed;
-			    color: @disable-color;
-			}
-			color: @theme-color;
-			background-color: #fff;
-		}
     }
-	.cal-day-view{
-	  	
-	}
-	.cal-day{
-		&.cal-weekend{
-			color: @theme-color;
-		}
-	}
+    .cal-hours{
+    	text-align: center;
+    	padding: 5px;
+    	.underline-editor{
+    		display: inline-block;
+    		width: 30px;
+    		text-align: center;
+    		border-bottom: solid 1px @disable-color;
+    		&:focus, &:active{
+    			outline: none;
+    			border: none;
+    			border-bottom: solid 1px @disable-color;
+    		}
+    	}
+    }
 }
