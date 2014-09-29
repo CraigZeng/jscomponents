@@ -154,8 +154,12 @@ var Datepicker = (function(){
     };
 
     var renderTime = function(){
+        var viewTime = this.selected || this.date;
         var wrap = '<div class="cal-hours">';
-        wrap = wrap + '<span contentEditable="true" class="underline-editor"></span>:<span contentEditable="true" class="underline-editor"></span>:<span contentEditable="true" class="underline-editor"></span>'
+        wrap = wrap + '<span contentEditable="true" class="underline-editor">' + 
+                    viewTime.getHours() + '</span>:<span contentEditable="true" class="underline-editor">' +
+                    viewTime.getMinutes() + '</span>:<span contentEditable="true" class="underline-editor">'+
+                    viewTime.getSeconds() + '</span>';
         return wrap + '</div>';
     };
 
@@ -196,7 +200,9 @@ var Datepicker = (function(){
             table = table + tr;
         }
         table = table + '</table>';
-        table = table + renderTime.call(this);
+        if (this.hasTime) {
+            table = table + renderTime.call(this);
+        }
         return table;
     };
 
@@ -251,6 +257,18 @@ var Datepicker = (function(){
             this.ele.value = utils.date.formatDate2Str(this.selected, this.format);
         }
     };
+
+    /**
+     * 获取时间
+     */
+    var getTimeFromEle = function(){
+        var time = {},
+            holder = this.dayHolder.children[2];
+        time.hours = +holder.children[0].innerHTML;
+        time.minutes = +holder.children[1].innerHTML;
+        time.seconds = +holder.children[2].innerHTML;
+        return time;
+    };
     
     var position = function(holder, refNode){
         var pos = utils.dom.getOffset(refNode);
@@ -284,10 +302,17 @@ var Datepicker = (function(){
     };
 
     var updateSelected = function(year, month, day){
+        var time;
         if(!this.selected){ this.selected = new Date();}
         this.selected.setMonth(month);
         this.selected.setDate(day);
         this.selected.setYear(year);
+        if(this.hasTime){
+            time = getTimeFromEle.call(this);
+            this.selected.setHours(time.hours);
+            this.selected.setMinutes(time.minutes);
+            this.selected.setSeconds(time.seconds);
+        }
     };
 
     var bindEvent = function(o){
@@ -296,14 +321,15 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.holder, 'selectstart', function(event){
-            if(!utils.dom.hasClass(target, 'underline-editor')){
+            var target = event.target || event.srcElement;
+            if((target.nodeType === 1) && !utils.dom.hasClass(target, 'underline-editor')){
                 utils.dom.preventDefault(event);
             }
         });
 
         utils.dom.addEvent(o.dayHolder, 'click', function(event){
             var target = event.target || event.srcElement;
-            var day, month;
+            var day, month, params;
             if(!utils.dom.hasClass(target, 'cal-disabled')){
                if(utils.dom.hasClass(target, 'cal-day')){
                    day = +target.innerHTML;
@@ -317,7 +343,8 @@ var Datepicker = (function(){
                        o.date.setDate(1);
                        o.date.setMonth(month);
                    }
-                   updateSelected.call(o, o.date.getFullYear(), month, day);
+                   params = [o.date.getFullYear(), month, day];
+                   updateSelected.apply(o, params);
                    updateInput.call(o);
                    o.fire('selected', o.selected);
                    o.hide();
@@ -333,8 +360,6 @@ var Datepicker = (function(){
                    o.monHolder.innerHTML = renderHead.call(o, VIEW.month) + renderMonth.call(o);
                    o.dayHolder.style.display = 'none';
                    o.monHolder.style.display = 'block';    
-               } else if(utils.dom.hasClass(target, 'underline-editor')){
-                   
                }
             }
             utils.dom.stopPropagation(event);
@@ -364,8 +389,6 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.ele, 'mousedown', function(event){
-            position(o.holder, o.ele);
-            o.show();
             utils.dom.stopPropagation(event);
         });
 
@@ -374,7 +397,6 @@ var Datepicker = (function(){
             o.show();
             utils.dom.stopPropagation(event);
         });
-
     };
 
     /**
@@ -414,6 +436,8 @@ var Datepicker = (function(){
             }
         },
         show : function(){
+            this.date = this.selected || new Date();
+            this.dayHolder.innerHTML = renderHead.call(this, VIEW.day) + renderDate.call(this);
             this.holder.style.display = 'block';
         },
         hide : function(){

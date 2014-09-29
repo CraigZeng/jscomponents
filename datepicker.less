@@ -96,15 +96,17 @@
     .cal-hours{
     	text-align: center;
     	padding: 5px;
+    	background-color: @theme-color;
+    	color: @theme-text-color;
     	.underline-editor{
     		display: inline-block;
     		width: 30px;
     		text-align: center;
-    		border-bottom: solid 1px @disable-color;
+    		border-bottom: solid 1px @theme-text-color;
     		&:focus, &:active{
     			outline: none;
     			border: none;
-    			border-bottom: solid 1px @disable-color;
+    			border-bottom: solid 1px @theme-text-color;
     		}
     	}
     }

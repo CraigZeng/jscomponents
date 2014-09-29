@@ -23,12 +23,13 @@
 		   	   ele : "startTime",
 		   	   limit : function(year, month, day){
 		   	   	   var now = new Date();
-		   	   	   return year > now.getFullYear() || month > now.getMonth() || (year == now.getFullYear() && month == now.getMonth() && day >= now.getDate()) || false
+		   	   	   return year > now.getFullYear() || (year == now.getFullYear() && month > now.getMonth()) || (year == now.getFullYear() && month == now.getMonth() && day >= now.getDate()) || false
 		   	   }
 		    });
 
 		    var end = new Datepicker({
 		   	   ele : "endTime",
+		   	   hasTime : true,
 		   	   limit : function(year, month, day){
 		   	   	   var now = start.getVal();
 		   	   	   return year > now.getFullYear() || (year == now.getFullYear() && month > now.getMonth()) || (year == now.getFullYear() && month == now.getMonth() && day >= now.getDate()) || false
