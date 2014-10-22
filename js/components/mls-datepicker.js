@@ -304,9 +304,11 @@ var Datepicker = (function(){
     var updateSelected = function(year, month, day){
         var time;
         if(!this.selected){ this.selected = new Date();}
-        this.selected.setMonth(month);
-        this.selected.setDate(day);
-        this.selected.setYear(year);
+        if (year) {
+            this.selected.setMonth(month);
+            this.selected.setDate(day);
+            this.selected.setYear(year);
+        }
         if(this.hasTime){
             time = getTimeFromEle.call(this);
             this.selected.setHours(time.hours);
@@ -321,13 +323,26 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.holder, 'selectstart', function(event){
+            event = event || window.event;
             var target = event.target || event.srcElement;
             if((target.nodeType === 1) && !utils.dom.hasClass(target, 'underline-editor')){
                 utils.dom.preventDefault(event);
             }
         });
 
+        if (o.hasTime) {
+            utils.dom.addEvent(o.dayHolder, 'keydown', function(event){
+                event = event || window.event;
+                if (event.keyCode === 13) {
+                    updateSelected.apply(o);
+                    o.fire('selected', o.selected);
+                    o.hide();
+                }
+            });
+        }
+
         utils.dom.addEvent(o.dayHolder, 'click', function(event){
+            event = event || window.event;
             var target = event.target || event.srcElement;
             var day, month, params;
             if(!utils.dom.hasClass(target, 'cal-disabled')){
@@ -366,6 +381,7 @@ var Datepicker = (function(){
         });
 
         utils.dom.addEvent(o.monHolder, 'click', function(event){
+            event = event || window.event;
             var target = event.target || event.srcElement;
             var month;
             if(!utils.dom.hasClass(target, 'cal-disabled')){
@@ -387,12 +403,14 @@ var Datepicker = (function(){
             }
             utils.dom.stopPropagation(event);
         });
-
+        
         utils.dom.addEvent(o.ele, 'mousedown', function(event){
+            event = event || window.event;
             utils.dom.stopPropagation(event);
         });
 
         utils.dom.addEvent(o.ele, 'click', function(event){
+            event = event || window.event;
             position(o.holder, o.ele);
             o.show();
             utils.dom.stopPropagation(event);
