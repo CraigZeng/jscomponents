@@ -157,9 +157,9 @@ var Datepicker = (function(){
         var viewTime = this.selected || this.date;
         var wrap = '<div class="cal-hours">';
         wrap = wrap + '<span contentEditable="true" class="underline-editor">' + 
-                    viewTime.getHours() + '</span>:<span contentEditable="true" class="underline-editor">' +
-                    viewTime.getMinutes() + '</span>:<span contentEditable="true" class="underline-editor">'+
-                    viewTime.getSeconds() + '</span>';
+                    (viewTime.getHours() < 10 ? '0' + viewTime.getHours() : viewTime.getHours())+ '</span>:<span contentEditable="true" class="underline-editor">' +
+                    (viewTime.getMinutes() < 10 ? '0' + viewTime.getMinutes() : viewTime.getMinutes()) + '</span>:<span contentEditable="true" class="underline-editor">'+
+                    (viewTime.getSeconds() < 10 ? '0' + viewTime.getSeconds(): viewTime.getSeconds()) + '</span>';
         return wrap + '</div>';
     };
 
@@ -289,6 +289,7 @@ var Datepicker = (function(){
          * ele 绑定的input元素
          */
         o.date = options.date || new Date();
+        o.date.setDate(1);
         o.format = options.format || 'yyyy-MM-dd'
         o.selected = options.selected || null;
         o.viewModel = VIEW.day;
@@ -305,9 +306,10 @@ var Datepicker = (function(){
         var time;
         if(!this.selected){ this.selected = new Date();}
         if (year) {
-            this.selected.setMonth(month);
-            this.selected.setDate(day);
+            this.selected.setDate(1);
             this.selected.setYear(year);
+            this.selected.setMonth(month);
+            this.selected.setDate(day);    
         }
         if(this.hasTime){
             time = getTimeFromEle.call(this);
@@ -454,7 +456,12 @@ var Datepicker = (function(){
             }
         },
         show : function(){
-            this.date = this.selected || new Date();
+            this.date = new Date();
+            this.date.setDate(1);
+            if (this.selected) {
+                this.date.setYear(this.selected.getFullYear());
+                this.date.setMonth(this.selected.getMonth());
+            }
             this.dayHolder.innerHTML = renderHead.call(this, VIEW.day) + renderDate.call(this);
             this.holder.style.display = 'block';
         },
