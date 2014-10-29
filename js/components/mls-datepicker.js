@@ -337,6 +337,7 @@ var Datepicker = (function(){
                 event = event || window.event;
                 if (event.keyCode === 13) {
                     updateSelected.apply(o);
+                    updateInput.call(o);
                     o.fire('selected', o.selected);
                     o.hide();
                 }
