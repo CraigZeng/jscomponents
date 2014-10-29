@@ -1,10 +1,7 @@
 var Datepicker = (function(){
     "use strict";
     var doc = document;
-    var VIEW = {
-        "month": 1,
-        "day" : 2
-    };
+    var VIEW = { "month": 1, "day" : 2};
     var MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var WEEKEND_NAMES = ["日","一","二","三","四","五","六"];
     var utils = {
@@ -154,7 +151,7 @@ var Datepicker = (function(){
     };
 
     var renderTime = function(){
-        var viewTime = this.selected || this.date;
+        var viewTime = this.defaultOptions.selected || this.defaultOptions.date;
         var wrap = '<div class="cal-hours">';
         wrap = wrap + '<span contentEditable="true" class="underline-editor">' + 
                     (viewTime.getHours() < 10 ? '0' + viewTime.getHours() : viewTime.getHours())+ '</span>:<span contentEditable="true" class="underline-editor">' +
@@ -164,7 +161,7 @@ var Datepicker = (function(){
     };
 
     var renderDate = function(){
-        var currentDate = this.date, i;
+        var currentDate = this.defaultOptions.date, i;
         var year = currentDate.getFullYear();
         var month = currentDate.getMonth(), day = currentDate.getDate();
         var table = '<table><thead>' + renderWeekHead() + '</thead>';
@@ -175,8 +172,8 @@ var Datepicker = (function(){
         var emptyFirstTD = firstDayOfMonth.getDay(), emptyLastTD = lastDayOfMonth.getDay();
         var startDate = 1, endDate = lastDayOfMonth.getDate();
         var tr = '', start, end, tdCls, weekend = 0;
-        var selectedDate = this.selected ? this.selected.getDate() : 100;
-        var hilightSelected = (this.selected && this.selected.getFullYear() === this.date.getFullYear() && this.selected.getMonth() === this.date.getMonth()) ? true : false;
+        var selectedDate = this.defaultOptions.selected ? this.defaultOptions.selected.getDate() : 100;
+        var hilightSelected = (this.defaultOptions.selected && this.defaultOptions.selected.getFullYear() === this.defaultOptions.date.getFullYear() && this.defaultOptions.selected.getMonth() === this.defaultOptions.date.getMonth()) ? true : false;
         for(start = startDate - emptyFirstTD, end = endDate + 6 - emptyLastTD; start <= end ;){
             tr = '<tr>';
             for (i = 0; i < 7; i++) {
@@ -184,13 +181,13 @@ var Datepicker = (function(){
                 if (start >= startDate && start <= endDate) {
                     if(hilightSelected && start === selectedDate){ tdCls += ' cal-selected'; }
                     if(weekend%7 === 0 || weekend%7 === 6 ){ tdCls += ' cal-weekend'; }
-                    if(!this.limit(year, month, start)){ tdCls += ' cal-disabled';}
+                    if(!this.defaultOptions.limit(year, month, start)){ tdCls += ' cal-disabled';}
                     tr = tr + '<td class="' + tdCls +'">' + start + '</td>';
                 } else if(start < startDate){
-                    if(!this.limit(lastDayofLastMonth.getFullYear(), lastDayofLastMonth.getMonth(), lastDayofLastMonth.getDate() + start)){ tdCls += ' cal-disabled';}
+                    if(!this.defaultOptions.limit(lastDayofLastMonth.getFullYear(), lastDayofLastMonth.getMonth(), lastDayofLastMonth.getDate() + start)){ tdCls += ' cal-disabled';}
                     tr = tr + '<td class="' + tdCls + ' cal-prev-month-day">' + (lastDayofLastMonth.getDate() + start) + '</td>';
                 } else {
-                    if(!this.limit(firstDayOfNextMonth.getFullYear(), firstDayOfNextMonth.getMonth(), start - endDate)){ tdCls += ' cal-disabled';}
+                    if(!this.defaultOptions.limit(firstDayOfNextMonth.getFullYear(), firstDayOfNextMonth.getMonth(), start - endDate)){ tdCls += ' cal-disabled';}
                     tr = tr + '<td class="' + tdCls + ' cal-next-month-day">' + (start - endDate) + '</td>';
                 }
                 start++;
@@ -200,14 +197,14 @@ var Datepicker = (function(){
             table = table + tr;
         }
         table = table + '</table>';
-        if (this.hasTime) {
+        if (this.defaultOptions.hasTime) {
             table = table + renderTime.call(this);
         }
         return table;
     };
 
     var renderHead = function(viewModel){
-        var currentDate = this.date;
+        var currentDate = this.defaultOptions.date;
         var year = currentDate.getFullYear(),
             month = currentDate.getMonth() + 1;
         var text =  viewModel == VIEW.day ? year + "-" + (month<10 ? '0' + month : month) : year ;
@@ -220,9 +217,9 @@ var Datepicker = (function(){
     };
 
     var renderMonth = function(){
-        var currentDate = this.date;
+        var currentDate = this.defaultOptions.date;
         var table = '<table>', 
-            month = this.date.getMonth(),
+            month = this.defaultOptions.date.getMonth(),
             tr, i, j, cls;
         var currentMonth = 0;
         for(i = 0; i < 3; i++){
@@ -253,8 +250,8 @@ var Datepicker = (function(){
     };
 
     var updateInput = function(){
-        if(this.selected){
-            this.ele.value = utils.date.formatDate2Str(this.selected, this.format);
+        if(this.defaultOptions.selected){
+            this.defaultOptions.ele.value = utils.date.formatDate2Str(this.defaultOptions.selected, this.defaultOptions.format);
         }
     };
 
@@ -288,15 +285,16 @@ var Datepicker = (function(){
          * limit 在渲染日期时的判断条件 返回true表示可选 返回false不可选
          * ele 绑定的input元素
          */
-        o.date = options.date || new Date();
-        o.date.setDate(1);
-        o.format = options.format || 'yyyy-MM-dd'
-        o.selected = options.selected || null;
+        o.defaultOptions = options;
+        o.defaultOptions.date = options.date || new Date();
+        o.defaultOptions.date.setDate(1);
+        o.defaultOptions.format = options.format || 'yyyy-MM-dd'
+        o.defaultOptions.selected = options.selected || null;
+        o.defaultOptions.hasTime = options.hasTime || false;
+        o.defaultOptions.limit = options.limit || function(){ return true;};
+        o.defaultOptions.ele = utils.dom.getNode(options.ele);
+        o.defaultOptions.listeners = {};
         o.viewModel = VIEW.day;
-        o.hasTime = options.hasTime || false;
-        o.limit = options.limit || function(){ return true;};
-        o.ele = utils.dom.getNode(options.ele);
-        o.listeners = {};
         o.holder = document.createElement('div');
         o.holder.style.display = 'none';
         doc.body.appendChild(o.holder);
@@ -304,18 +302,18 @@ var Datepicker = (function(){
 
     var updateSelected = function(year, month, day){
         var time;
-        if(!this.selected){ this.selected = new Date();}
+        if(!this.defaultOptions.selected){ this.defaultOptions.selected = new Date();}
         if (year) {
-            this.selected.setDate(1);
-            this.selected.setYear(year);
-            this.selected.setMonth(month);
-            this.selected.setDate(day);    
+            this.defaultOptions.selected.setDate(1);
+            this.defaultOptions.selected.setYear(year);
+            this.defaultOptions.selected.setMonth(month);
+            this.defaultOptions.selected.setDate(day);    
         }
-        if(this.hasTime){
+        if(this.defaultOptions.hasTime){
             time = getTimeFromEle.call(this);
-            this.selected.setHours(time.hours);
-            this.selected.setMinutes(time.minutes);
-            this.selected.setSeconds(time.seconds);
+            this.defaultOptions.selected.setHours(time.hours);
+            this.defaultOptions.selected.setMinutes(time.minutes);
+            this.defaultOptions.selected.setSeconds(time.seconds);
         }
     };
 
@@ -332,13 +330,13 @@ var Datepicker = (function(){
             }
         });
 
-        if (o.hasTime) {
+        if (o.defaultOptions.hasTime) {
             utils.dom.addEvent(o.dayHolder, 'keydown', function(event){
                 event = event || window.event;
                 if (event.keyCode === 13) {
                     updateSelected.apply(o);
                     updateInput.call(o);
-                    o.fire('selected', o.selected);
+                    o.fire('selected', o.defaultOptions.selected);
                     o.hide();
                 }
             });
@@ -351,27 +349,27 @@ var Datepicker = (function(){
             if(!utils.dom.hasClass(target, 'cal-disabled')){
                if(utils.dom.hasClass(target, 'cal-day')){
                    day = +target.innerHTML;
-                   month = o.date.getMonth();
+                   month = o.defaultOptions.date.getMonth();
                    if (utils.dom.hasClass(target, 'cal-prev-month-day')) {
                        month = month - 1;
-                       o.date.setDate(1);
-                       o.date.setMonth(month);
+                       o.defaultOptions.date.setDate(1);
+                       o.defaultOptions.date.setMonth(month);
                    } else if(utils.dom.hasClass(target, 'cal-next-month-day')) {
                        month = month + 1;
-                       o.date.setDate(1);
-                       o.date.setMonth(month);
+                       o.defaultOptions.date.setDate(1);
+                       o.defaultOptions.date.setMonth(month);
                    }
-                   params = [o.date.getFullYear(), month, day];
+                   params = [o.defaultOptions.date.getFullYear(), month, day];
                    updateSelected.apply(o, params);
                    updateInput.call(o);
-                   o.fire('selected', o.selected);
+                   o.fire('selected', o.defaultOptions.selected);
                    o.hide();
                    o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
                }else if(utils.dom.hasClass(target, 'cal-prev')){
-                   o.date.setMonth(o.date.getMonth()-1);
+                   o.defaultOptions.date.setMonth(o.defaultOptions.date.getMonth()-1);
                    o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
                }else if(utils.dom.hasClass(target, 'cal-next')){
-                   o.date.setMonth(o.date.getMonth()+1);
+                   o.defaultOptions.date.setMonth(o.defaultOptions.date.getMonth()+1);
                    o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
                }else if(utils.dom.hasClass(target, 'cal-date-text')){
                    o.viewModel = VIEW.month;
@@ -391,30 +389,36 @@ var Datepicker = (function(){
                if(utils.dom.hasClass(target, 'cal-month')){
                    month = target.getAttribute('data-month');
                    target.className = 'cal-month cal-selected';
-                   o.date.setMonth(month);
+                   o.defaultOptions.date.setMonth(month);
                    o.viewModel = VIEW.day;
                    o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
                    o.monHolder.style.display = 'none';
                    o.dayHolder.style.display = 'block'; 
                }else if(utils.dom.hasClass(target, 'cal-prev')){
-                   o.date.setYear(o.date.getFullYear()-1);
-                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.date.getFullYear() + '年';
+                   o.defaultOptions.date.setYear(o.defaultOptions.date.getFullYear()-1);
+                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.defaultOptions.date.getFullYear() + '年';
                }else if(utils.dom.hasClass(target, 'cal-next')){
-                   o.date.setYear(o.date.getFullYear()+1);
-                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.date.getFullYear() + '年';
+                   o.defaultOptions.date.setYear(o.defaultOptions.date.getFullYear()+1);
+                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.defaultOptions.date.getFullYear() + '年';
                }
             }
             utils.dom.stopPropagation(event);
         });
-        
-        utils.dom.addEvent(o.ele, 'mousedown', function(event){
+
+        utils.dom.addEvent(o.defaultOptions.ele, 'mousedown', function(event){
             event = event || window.event;
             utils.dom.stopPropagation(event);
         });
 
-        utils.dom.addEvent(o.ele, 'click', function(event){
+        utils.dom.addEvent(o.defaultOptions.ele, 'click', function(event){
+            var ele, indexKey;
             event = event || window.event;
-            position(o.holder, o.ele);
+            ele = event.target || event.srcElement;
+            indexKey = ele.getAttribute(DATEPICKER_INDEX);
+            if (indexKey) {
+                o.defaultOptions = optionsMap[indexKey];
+            }
+            position(o.holder, o.defaultOptions.ele);  
             o.show();
             utils.dom.stopPropagation(event);
         });
@@ -436,20 +440,69 @@ var Datepicker = (function(){
         bindEvent(this);
         
         //定位日历控件
-        position(this.holder, this.ele);
+        position(this.holder, this.defaultOptions.ele);
         
+    };
+
+    var mergeDefaultOptions = function(options){
+        var defaultOptions = options;
+        defaultOptions.date = options.date || new Date();
+        defaultOptions.date.setDate(1);
+        defaultOptions.format = options.format || 'yyyy-MM-dd'
+        defaultOptions.selected = options.selected || null;
+        defaultOptions.hasTime = options.hasTime || false;
+        defaultOptions.limit = options.limit || function(){ return true;};
+        defaultOptions.ele = utils.dom.getNode(options.ele);
+        defaultOptions.listeners = {};
+        return defaultOptions;
+    };
+
+    var instance = null,
+        optionsMap = {}, 
+        current= 0, 
+        DATEPICKER_INDEX = 'data-datepickerIndex';
+
+    /**
+     * 初始化日期控件
+     */
+    datepicker.bind = function(options){
+        var ele = utils.dom.getNode(options.ele);
+        ele.setAttribute(DATEPICKER_INDEX, ++current);
+        optionsMap[current] = options;
+        if (!instance) {
+            instance = new Datepicker(options);
+        } else {
+            mergeDefaultOptions(options)
+            utils.dom.addEvent(ele, 'mousedown', function(event){
+                event = event || window.event;
+                utils.dom.stopPropagation(event);
+            });
+
+            utils.dom.addEvent(ele, 'click', function(event){
+                var ele, indexKey;
+                event = event || window.event;
+                ele = event.target || event.srcElement;
+                indexKey = ele.getAttribute(DATEPICKER_INDEX);
+                if (indexKey) {
+                    instance.defaultOptions = optionsMap[indexKey];
+                }
+                position(instance.holder, instance.defaultOptions.ele);
+                instance.show();
+                utils.dom.stopPropagation(event);
+            });
+        }
     };
 
     datepicker.prototype = {
         constructor : datepicker,
         listen : function(eventType, fn){
-            if(!this.listeners[eventType]){
-                this.listeners[eventType] = [];
+            if(!this.defaultOptions.listeners[eventType]){
+                this.defaultOptions.listeners[eventType] = [];
             }
-            this.listeners[eventType].push(fn);
+            this.defaultOptions.listeners[eventType].push(fn);
         },
         fire : function(eventType, data){
-            var fns = this.listeners[eventType], i;
+            var fns = this.defaultOptions.listeners[eventType], i;
             if(fns){
                 for(i = 0; i < fns.length; i++){
                     fns[i](data);
@@ -457,11 +510,11 @@ var Datepicker = (function(){
             }
         },
         show : function(){
-            this.date = new Date();
-            this.date.setDate(1);
-            if (this.selected) {
-                this.date.setYear(this.selected.getFullYear());
-                this.date.setMonth(this.selected.getMonth());
+            this.defaultOptions.date = new Date();
+            this.defaultOptions.date.setDate(1);
+            if (this.defaultOptions.selected) {
+                this.defaultOptions.date.setYear(this.defaultOptions.selected.getFullYear());
+                this.defaultOptions.date.setMonth(this.defaultOptions.selected.getMonth());
             }
             this.dayHolder.innerHTML = renderHead.call(this, VIEW.day) + renderDate.call(this);
             this.holder.style.display = 'block';
@@ -473,11 +526,11 @@ var Datepicker = (function(){
             this.dayHolder.innerHTML = renderHead.call(this, VIEW.day) + renderDate.call(this);
         },
         select : function(selectedDate){
-            this.selected = selectedDate || new Date();
+            this.defaultOptions.selected = selectedDate || new Date();
             render.call(this);
         },
         getVal : function(){
-            return this.selected || new Date();
+            return this.defaultOptions.selected || new Date();
         }
     };
 

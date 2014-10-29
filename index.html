@@ -18,6 +18,8 @@
 		<br/>
 		<input type="text" id="startTime"/>
 		<input type="text" id="endTime"/>
+		<input type="text" id="bindTime1"/>
+		<input type="text" id="bindTime2"/>
 		<script type="text/javascript">
 		    var start = new Datepicker({
 		   	   ele : "startTime",
@@ -30,6 +32,7 @@
 		    var end = new Datepicker({
 		   	   ele : "endTime",
 		   	   hasTime : true,
+		   	   format : "yyyy-MM-dd HH:mm:ss",
 		   	   limit : function(year, month, day){
 		   	   	   var now = start.getVal();
 		   	   	   return year > now.getFullYear() || (year == now.getFullYear() && month > now.getMonth()) || (year == now.getFullYear() && month == now.getMonth() && day >= now.getDate()) || false
@@ -38,6 +41,17 @@
 
 		    start.listen('selected', function(){
 		    	end.refresh();
+		    });
+
+		    Datepicker.bind({
+		    	ele : "bindTime1",
+		   	    hasTime : true,
+		   	    format : "yyyy-MM-dd HH:mm:ss", 
+		    });
+
+		    Datepicker.bind({
+		    	ele : "bindTime2",
+		   	    format : "yyyy-MM-dd", 
 		    });
 
 		</script>
