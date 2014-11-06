@@ -72,10 +72,22 @@
 
 				Dialog.utils.dom.addEvent('alertDig', 'click', function(){
 					Dialog.alert({
-						title : "系统提示框",
 						msg: "删除成功"
 					}, function(flag){ console.log(flag)});
 				});
+
+				Dialog.utils.dom.addEvent('confirmDig', 'click', function(){
+					Dialog.alert({
+						msg: "确定删除***?"
+					}, function(flag){ alert(flag)});
+				});
+
+				Dialog.utils.dom.addEvent('promptDig', 'click', function(){
+					Dialog.alert({
+						msg: "请输入价格"
+					}, function(flag, container){ alert(flag)});
+				});
+
 		</script>
 	</body>
 </html>

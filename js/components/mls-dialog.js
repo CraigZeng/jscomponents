@@ -230,7 +230,7 @@ var Dialog = (function(){
     this.options.callbackFuncs = {
       "sureFunc" : function(){
          that.destroy();
-         cb && cb(true);
+         cb && cb(true, container);
       },
       "cancelFunc" : function(){
          that.destroy();
@@ -324,7 +324,10 @@ var Dialog = (function(){
    * isAll是否替换整个模板包含（head和footer）
    */
   Dialog.prompt = function(options, cb){
-
+    options = options || {type:"promptTpl"};
+    options.type = "promptTpl";
+    var dlg = new Dialog(options, cb);
+    dlg.show();
   };
 
   /**
@@ -338,7 +341,10 @@ var Dialog = (function(){
    * isAll是否替换整个模板包含（head和footer）
    */
   Dialog.confirm = function(options, cb){
-
+    options = options || {type:"confirmTpl"};
+    options.type = "confirmTpl";
+    var dlg = new Dialog(options, cb);
+    dlg.show();
   };
 
   Dialog.open = function(options, cb){
