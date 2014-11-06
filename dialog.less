@@ -1,0 +1,56 @@
+@primary-color: #f69;
+@gray-color: #ddd;
+
+body{
+  padding: 10px;
+}
+
+.dlg-container{
+  margin: 0 auto;
+  margin-top: 100px;
+  border: solid 1px @primary-color;
+  background-color: #fff;
+  .dlg-btn{
+    border: none;
+    outline: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    &.dlg-sure{
+      background-color: @primary-color;
+      color: #fff;
+      &:hover{
+        background-color: darken(@primary-color, 10%);
+      }
+    }
+    &.dlg-cancel{
+      background-color: @gray-color;
+      &:hover{
+        background-color: darken(@gray-color, 10%);
+      }
+    }
+  }
+  .dlg-header{
+    padding: 5px;
+    background-color: @primary-color;
+    color: #fff;
+    overflow: hidden;
+    .dlg-title{
+
+    }
+    .dlg-close-btn{
+      cursor: pointer;
+      float: right;
+    }
+  }
+  .dlg-content{
+    padding: 10px;
+    text-align: center;
+  }
+  .dlg-footer{
+    padding: 5px;
+    text-align: center;
+    .dlg-btn{
+      margin: 0 15px;
+    }
+  }
+}

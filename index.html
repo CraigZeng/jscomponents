@@ -6,6 +6,18 @@
 		<link rel="stylesheet" type="text/css" href="datepicker.css" />
 		<script type="text/javascript" src="js/components/mls-validate.js" ></script>
 		<script type="text/javascript" src="js/components/mls-datepicker.js"></script>
+		<script type="text/javascript" src="js/components/mls-dialog.js"></script>
+		<style>
+		  .dialogMaskFrame{
+				position: fixed;
+				border: none;
+				background-color: rgba(250,250,250, 0.6);
+				width: 100%;
+				left: 0;
+				top: 0;
+				z-index: 100;
+			}
+		</style>
 	</head>
 	<body>
 		<input type="text" id="name"/><span id="name-msg"></span>
@@ -20,6 +32,10 @@
 		<input type="text" id="endTime"/>
 		<input type="text" id="bindTime1"/>
 		<input type="text" id="bindTime2"/>
+		<input type="button" id="alertDig" value="警告框"/>
+		<input type="button" id="confirmDig" value="确认框"/>
+		<input type="button" id="promptDig" value="输入提示框"/>
+		<input type="button" id="dialog" value="普通对话框"/>
 		<script type="text/javascript">
 		    var start = new Datepicker({
 		   	   ele : "startTime",
@@ -46,14 +62,20 @@
 		    Datepicker.bind({
 		    	ele : "bindTime1",
 		   	    hasTime : true,
-		   	    format : "yyyy-MM-dd HH:mm:ss", 
+		   	    format : "yyyy-MM-dd HH:mm:ss",
 		    });
 
 		    Datepicker.bind({
 		    	ele : "bindTime2",
-		   	    format : "yyyy-MM-dd", 
+		   	    format : "yyyy-MM-dd",
 		    });
 
+				Dialog.utils.dom.addEvent('alertDig', 'click', function(){
+					Dialog.alert({
+						title : "系统提示框",
+						msg: "删除成功"
+					}, function(flag){ console.log(flag)});
+				});
 		</script>
 	</body>
 </html>
