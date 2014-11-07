@@ -77,17 +77,25 @@
 				});
 
 				Dialog.utils.dom.addEvent('confirmDig', 'click', function(){
-					Dialog.alert({
+					Dialog.confirm({
 						msg: "确定删除***?"
 					}, function(flag){ alert(flag)});
 				});
 
 				Dialog.utils.dom.addEvent('promptDig', 'click', function(){
-					Dialog.alert({
+					Dialog.prompt({
 						msg: "请输入价格"
-					}, function(flag, container){ alert(flag)});
+					}, function(flag, data, container){ console.log(container)});
 				});
 
+				Dialog.utils.dom.addEvent('dialog', 'click', function(){
+					Dialog.open({
+						msg: "请选择商品",
+						tpl:"<div>测试</div>",
+						url: "dialog.html",
+						onload: function(){ alert()}
+					}, function(flag){ console.log(flag)});
+				});
 		</script>
 	</body>
 </html>

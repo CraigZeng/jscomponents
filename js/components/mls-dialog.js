@@ -183,6 +183,7 @@ var Dialog = (function(){
    * DEFAULT_FOOTER 默认底部模板
    */
   var DEFAULT_HEADER = '<div class="dlg-header"><span class="dlg-title">{{title}}</span><span class="dlg-close-btn" id="{{closeBtnId}}">&times</span></div>',
+
       DEFAULT_FOOTER = '<div class="dlg-footer"><button id="{{sureBtnId}}" class="dlg-sure dlg-btn">确&nbsp;&nbsp;定</button><button class="dlg-cancel dlg-btn" id="{{cancelBtnId}}">取&nbsp;&nbsp;消</button></div>';
 
   /**
@@ -203,8 +204,9 @@ var Dialog = (function(){
     width : 380,
     isAll: false,
     msg: "",
+    defaultInputId: "defaultInput",
     alertTpl : '<div class="dlg-content">{{msg}}</div>',
-    promptTpl : '<div class="dlg-content"><div class="dlg-prompt-tip">{{msg}}</div><div class="dlg-prompt-input-wrap"><input type="text" class="dlg-prompt-input"/></div></div>',
+    promptTpl : '<div class="dlg-content"><div class="dlg-prompt-tip">{{msg}}</div><div class="dlg-prompt-input-wrap"><input type="text" id="{{defaultInputId}}" class="dlg-prompt-input"/></div></div>',
     confirmTpl : '<div class="dlg-content">{{msg}}</div>'
   };
 
@@ -218,6 +220,23 @@ var Dialog = (function(){
     });
   };
 
+
+  /**
+   * 获取container的数据
+   * dataIds container要取出的数据的id数组
+   */
+  var getContainerData = function(dataIds){
+    var doc = mask.contentWindow.document;
+    var i, len, id, data = {};
+    if (dataIds){
+      for (i = 0, len = dataIds.length; i < len; i++) {
+        id = dataIds[i];
+        data[id] = doc.getElementById(id).value;
+      }
+    }
+    return data;
+  };
+
   /**
    * 绑定事件处理
    */
@@ -229,8 +248,10 @@ var Dialog = (function(){
     var closeBtn = doc.getElementById(this.options.closeBtnId);
     this.options.callbackFuncs = {
       "sureFunc" : function(){
+         var wrap =  that.options.type="promptTpl" ? container.cloneNode(true) : null;
+         var data = that.options.type="promptTpl" ? getContainerData(that.options.dataIds) : null;
          that.destroy();
-         cb && cb(true, container);
+         cb && cb(true, data, wrap);
       },
       "cancelFunc" : function(){
          that.destroy();
@@ -317,16 +338,26 @@ var Dialog = (function(){
    * 请求输入框
    * @param options 配置json
    * @param cb 关闭后的回调函数
-   * options: {title:title, msg:msg, tpl:string, isAll: boolean}
+   * options: {title:title, msg:msg, tpl:string, defaultInputId: string,dataIds:[], isAll: boolean}
    * title 是对话框标题
    * msg 是提示信息
    * tpl 对话框的模板
+   * defaultInputId 默认的输入框的id
+   * dataIds 需要取得数据的id数组
    * isAll是否替换整个模板包含（head和footer）
    */
   Dialog.prompt = function(options, cb){
     options = options || {type:"promptTpl"};
     options.type = "promptTpl";
     var dlg = new Dialog(options, cb);
+
+    //初始化数据id数组
+    if (!options.dataIds){
+      options.dataIds = [options.defaultInputId];
+    } else {
+      options.dataIds.push(options.defaultInputId);
+    }
+
     dlg.show();
   };
 
@@ -347,8 +378,39 @@ var Dialog = (function(){
     dlg.show();
   };
 
+  /**
+   * 操作确认框
+   * @param options 配置json
+   * @param cb 关闭后的回调函数
+   * options: {title:title, tpl:string, url:string, onload:string, isAll: boolean}
+   * title 是对话框标题
+   * tpl 对话框的模板
+   * url 对话框对应的url url和tpl必须有且只能有一个
+   * params 当含有url时候可以附加参数
+   * onload 页面加载成功之后的事件回调
+   * isAll是否替换整个模板包含（head和footer）
+   */
   Dialog.open = function(options, cb){
+    var dlg;
 
+    options = options || {type:"dlgTpl"};
+    options.type = "dlgTpl";
+
+    //参数校验 tpl优先
+    if (options.url || options.tpl) {
+      if (options.tpl) {
+        dlg = new Dialog(options, cb);
+        options.onload && options.onload(container);
+        dlg.show();
+      } else {
+        utils.tools.ajax(options.url, 'POST', options.params || {}, function(response){
+          options.tpl = response;
+          dlg = new Dialog(options, cb);
+          options.onload && options.onload(container);
+          dlg.show();
+        });
+      }
+    }
   };
 
   Dialog.utils = utils;
