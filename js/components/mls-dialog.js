@@ -169,7 +169,8 @@ var Dialog = (function(){
             result = false;
           };
           req.open(method, url + (method == 'GET' ? '?' + utils.tools.series(params) : ''), !sync);
-          req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          //req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          req.setRequestHeader("Content-type", "text/html");
           req.send(method == 'POST' ? utils.tools.series(params) : null);
         };
         utils.tools.ajax.apply(this, arguments);
@@ -202,6 +203,7 @@ var Dialog = (function(){
     title:"系统提示框",
     isModal : true,
     width : 380,
+    height: 120,
     isAll: false,
     msg: "",
     defaultInputId: "defaultInput",
@@ -268,7 +270,7 @@ var Dialog = (function(){
   };
 
   var Dialog = function(options, cb){
-    var tpl = "";
+    var tpl = "", width;
     options = utils.tools.extends(options, defaultOptions);
 
     //拼接模板
@@ -287,7 +289,30 @@ var Dialog = (function(){
     container.innerHTML = renderTpl(tpl, options);
 
     //调整对话框样式
-    container.style.width = options.width + 'px';
+    width = options.width == 'auto' ? 'auto' : options.width + 'px';
+    container.style.width = width;
+
+    //是否模态框显示
+    var size = utils.dom.getViewPortSize();
+    if (!options.isModal) {
+      setTimeout(function(){
+        var doc = mask.contentWindow.document;
+        doc.body.className = 'modal';
+        mask.style.width = (options.width + 6) + 'px';
+        mask.style.height =  (doc.body.children[0].scrollHeight + 6) + 'px';
+        mask.style.left = (size.width - options.width - 6)/2 + 'px';
+        mask.style.top = '100px'
+      });
+    } else {
+      setTimeout(function(){
+        var doc = mask.contentWindow.document;
+        doc.body.className = '';
+        mask.style.width = '100%';
+        mask.style.height =  size.width + 'px';
+        mask.style.left = '0';
+        mask.style.top = '0'
+      });
+    }
 
     this.options = options;
 
