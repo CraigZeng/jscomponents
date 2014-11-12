@@ -12,6 +12,7 @@
 				position: fixed;
 				border: none;
 				background-color: rgba(250,250,250, 0.6);
+				filter: alpha(opacity=60);
 				width: 100%;
 				left: 0;
 				top: 0;
@@ -86,7 +87,7 @@
 				Dialog.utils.dom.addEvent('promptDig', 'click', function(){
 					Dialog.prompt({
 						msg: "请输入价格:"
-					}, function(flag, data, container){ console.log(container)});
+					}, function(flag, data, container){ console.log(data)});
 				});
 
 				Dialog.utils.dom.addEvent('dialog', 'click', function(){

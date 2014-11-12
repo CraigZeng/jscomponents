@@ -121,7 +121,7 @@ var Dialog = (function(){
       getBtnId : function(){
           return 'btn-' + (Math.random() * 1000000).toFixed(0);
       },
-      extends : function(data, def){
+      extend : function(data, def){
           if (def) {
             for (var key in def) {
                if(data[key] == null) {
@@ -271,7 +271,7 @@ var Dialog = (function(){
 
   var Dialog = function(options, cb){
     var tpl = "", width;
-    options = utils.tools.extends(options, defaultOptions);
+    options = utils.tools.extend(options, defaultOptions);
 
     //拼接模板
     if (options.isAll && options.tpl) {
@@ -444,19 +444,25 @@ var Dialog = (function(){
     //创建iframe并保存在mask中
     mask = utils.dom.createIframe('dialogMaskFrame');
     mask.className = 'dialogMaskFrame';
-    document.body.appendChild(mask);
 
     //创建对话框的容器
     container = document.createElement('div');
     container.className = "dlg-container"
     mask.style.display = "none";
+    mask.setAttribute("scrolling", "no");
+    mask.setAttribute("frameborder", "no");
+    mask.setAttribute("allowtransparency", "true");
 
     //初始化mask的大小和屏幕一样高
     mask.style.height = utils.dom.getViewPortSize().height + 'px';
-    mask.contentWindow.document.body.appendChild(container);
+    mask.onload= function(){
+      //添加对话框容器到dom
+      mask.contentWindow.document.body.appendChild(container);
+      //加载对话框里面的样式
+      utils.dom.importStyle('dialog.css', mask.contentWindow.document);
+    }
 
-    //加载对话框里面的样式
-    utils.dom.importStyle('dialog.css',mask.contentWindow.document);
+    document.body.appendChild(mask);
   }, 0);
 
   return Dialog;
