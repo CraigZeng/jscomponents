@@ -450,7 +450,7 @@ var Dialog = (function(){
     container.className = "dlg-container"
     mask.style.display = "none";
     mask.setAttribute("scrolling", "no");
-    mask.setAttribute("frameborder", "no");
+    mask.setAttribute("frameborder", "0", 0);
     mask.setAttribute("allowtransparency", "true");
 
     //初始化mask的大小和屏幕一样高
