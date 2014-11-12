@@ -115,6 +115,23 @@ var Dialog = (function(){
             link.setAttribute('rel','stylesheet');
             link.href = url;
             head.appendChild(link);
+        },
+        addStyle: function(cssString){
+            var style = document.createElement("style");
+            var heads = document.getElementsByTagName("head");
+            style.setAttribute("type", "text/css");
+
+            if(style.styleSheet){
+                style.styleSheet.cssText = cssString;
+            } else {
+                cssString = document.createTextNode(cssString);
+                style.appendChild(cssString);
+            }
+            if (heads.length) {
+                heads[0].appendChild(style);
+            } else {
+                document.documentElement.appendChild(style);
+            }
         }
     },
     tools : {
@@ -441,6 +458,18 @@ var Dialog = (function(){
   Dialog.utils = utils;
 
   setTimeout(function(){
+    //设置mask样式
+    utils.dom.addStyle('.dialogMaskFrame{' +
+      'position: fixed;' +
+      'border: none;' +
+      'background-color: #eee;' +
+      'background-color: rgba(250,250,250, 0.6);' +
+      'filter: alpha(opacity=80);' +
+      'width: 100%;' +
+      'left: 0;' +
+      'top: 0;' +
+      'z-index: 100;}');
+
     //创建iframe并保存在mask中
     mask = utils.dom.createIframe('dialogMaskFrame');
     mask.className = 'dialogMaskFrame';
