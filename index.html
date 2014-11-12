@@ -11,8 +11,9 @@
 		  .dialogMaskFrame{
 				position: fixed;
 				border: none;
+				background-color: #eee;
 				background-color: rgba(250,250,250, 0.6);
-				filter: alpha(opacity=60);
+				filter: alpha(opacity=80);
 				width: 100%;
 				left: 0;
 				top: 0;
@@ -63,12 +64,12 @@
 		    Datepicker.bind({
 		    	ele : "bindTime1",
 		   	    hasTime : true,
-		   	    format : "yyyy-MM-dd HH:mm:ss",
+		   	    format : "yyyy-MM-dd HH:mm:ss"
 		    });
 
 		    Datepicker.bind({
 		    	ele : "bindTime2",
-		   	    format : "yyyy-MM-dd",
+		   	  format : "yyyy-MM-dd"
 		    });
 
 				Dialog.utils.dom.addEvent('alertDig', 'click', function(){

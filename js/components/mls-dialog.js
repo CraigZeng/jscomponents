@@ -183,7 +183,7 @@ var Dialog = (function(){
    * DEFAULT_HEADER 默认头部模板
    * DEFAULT_FOOTER 默认底部模板
    */
-  var DEFAULT_HEADER = '<div class="dlg-header"><span class="dlg-title">{{title}}</span><span class="dlg-close-btn" id="{{closeBtnId}}">&times</span></div>',
+  var DEFAULT_HEADER = '<div class="dlg-header"><span class="dlg-close-btn" id="{{closeBtnId}}">&times</span><span class="dlg-title">{{title}}</span></div>',
 
       DEFAULT_FOOTER = '<div class="dlg-footer"><button id="{{sureBtnId}}" class="dlg-sure dlg-btn">确&nbsp;&nbsp;定</button><button class="dlg-cancel dlg-btn" id="{{cancelBtnId}}">取&nbsp;&nbsp;消</button></div>';
 
