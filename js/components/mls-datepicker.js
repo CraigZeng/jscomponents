@@ -137,7 +137,7 @@ var Datepicker = (function(){
                       .replace(/m+/g, repl('minute'))
                       .replace(/s+/g, repl('second'));
                 if(dateObj.year.length < 4){ dateObj.year = date.getFullYear().toString().slice(0,2) + '' + dateObj.year}
-                return new Date(dateObj.year, dateObj.month-1, dateObj.day, dateObj.hour, dateObj.minute, dateObj.second, dateObj.millseconds); 
+                return new Date(dateObj.year, dateObj.month-1, dateObj.day, dateObj.hour, dateObj.minute, dateObj.second, dateObj.millseconds);
             }
         }
     };
@@ -153,7 +153,7 @@ var Datepicker = (function(){
     var renderTime = function(){
         var viewTime = this.defaultOptions.selected || this.defaultOptions.date;
         var wrap = '<div class="cal-hours">';
-        wrap = wrap + '<span contentEditable="true" class="underline-editor">' + 
+        wrap = wrap + '<span contentEditable="true" class="underline-editor">' +
                     (viewTime.getHours() < 10 ? '0' + viewTime.getHours() : viewTime.getHours())+ '</span>:<span contentEditable="true" class="underline-editor">' +
                     (viewTime.getMinutes() < 10 ? '0' + viewTime.getMinutes() : viewTime.getMinutes()) + '</span>:<span contentEditable="true" class="underline-editor">'+
                     (viewTime.getSeconds() < 10 ? '0' + viewTime.getSeconds(): viewTime.getSeconds()) + '</span>';
@@ -209,16 +209,16 @@ var Datepicker = (function(){
             month = currentDate.getMonth() + 1;
         var text =  viewModel == VIEW.day ? year + "-" + (month<10 ? '0' + month : month) : year ;
         var head = '<div class="cal-header">' +
-                        '<span class="cal-prev">&lt;</span>' + 
+                        '<span class="cal-prev">&lt;</span>' +
                         '<span class="cal-next">&gt;</span>' +
-                        '<span class="cal-date-text">' +  text + '</span>' + 
+                        '<span class="cal-date-text">' +  text + '</span>' +
                    '</div>';
         return head;
     };
 
     var renderMonth = function(){
         var currentDate = this.defaultOptions.date;
-        var table = '<table>', 
+        var table = '<table>',
             month = this.defaultOptions.date.getMonth(),
             tr, i, j, cls;
         var currentMonth = 0;
@@ -266,7 +266,7 @@ var Datepicker = (function(){
         time.seconds = +holder.children[2].innerHTML;
         return time;
     };
-    
+
     var position = function(holder, refNode){
         var pos = utils.dom.getOffset(refNode);
         pos.top = refNode.offsetHeight + pos.top;
@@ -307,7 +307,7 @@ var Datepicker = (function(){
             this.defaultOptions.selected.setDate(1);
             this.defaultOptions.selected.setYear(year);
             this.defaultOptions.selected.setMonth(month);
-            this.defaultOptions.selected.setDate(day);    
+            this.defaultOptions.selected.setDate(day);
         }
         if(this.defaultOptions.hasTime){
             time = getTimeFromEle.call(this);
@@ -359,7 +359,7 @@ var Datepicker = (function(){
                        o.defaultOptions.date.setDate(1);
                        o.defaultOptions.date.setMonth(month);
                    }
-                   params = [o.defaultOptions.date.getFullYear(), month, day];
+                   params = [o.defaultOptions.date.getFullYear(), o.defaultOptions.date.getMonth(), day];
                    updateSelected.apply(o, params);
                    updateInput.call(o);
                    o.fire('selected', o.defaultOptions.selected);
@@ -375,7 +375,7 @@ var Datepicker = (function(){
                    o.viewModel = VIEW.month;
                    o.monHolder.innerHTML = renderHead.call(o, VIEW.month) + renderMonth.call(o);
                    o.dayHolder.style.display = 'none';
-                   o.monHolder.style.display = 'block';    
+                   o.monHolder.style.display = 'block';
                }
             }
             utils.dom.stopPropagation(event);
@@ -393,7 +393,7 @@ var Datepicker = (function(){
                    o.viewModel = VIEW.day;
                    o.dayHolder.innerHTML = renderHead.call(o, VIEW.day) + renderDate.call(o);
                    o.monHolder.style.display = 'none';
-                   o.dayHolder.style.display = 'block'; 
+                   o.dayHolder.style.display = 'block';
                }else if(utils.dom.hasClass(target, 'cal-prev')){
                    o.defaultOptions.date.setYear(o.defaultOptions.date.getFullYear()-1);
                    o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.defaultOptions.date.getFullYear() + '年';
@@ -418,7 +418,7 @@ var Datepicker = (function(){
             if (indexKey) {
                 o.defaultOptions = optionsMap[indexKey];
             }
-            position(o.holder, o.defaultOptions.ele);  
+            position(o.holder, o.defaultOptions.ele);
             o.show();
             utils.dom.stopPropagation(event);
         });
@@ -438,10 +438,10 @@ var Datepicker = (function(){
 
         //绑定事件
         bindEvent(this);
-        
+
         //定位日历控件
         position(this.holder, this.defaultOptions.ele);
-        
+
     };
 
     var mergeDefaultOptions = function(options){
@@ -458,8 +458,8 @@ var Datepicker = (function(){
     };
 
     var instance = null,
-        optionsMap = {}, 
-        current= 0, 
+        optionsMap = {},
+        current= 0,
         DATEPICKER_INDEX = 'data-datepickerIndex';
 
     /**
