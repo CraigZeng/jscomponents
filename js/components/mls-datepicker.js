@@ -396,10 +396,10 @@ var Datepicker = (function(){
                    o.dayHolder.style.display = 'block';
                }else if(utils.dom.hasClass(target, 'cal-prev')){
                    o.defaultOptions.date.setYear(o.defaultOptions.date.getFullYear()-1);
-                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.defaultOptions.date.getFullYear() + '年';
+                   o.monHolder.firstChild.firstChild.nextSibling.nextSibling.innerHTML = o.defaultOptions.date.getFullYear();
                }else if(utils.dom.hasClass(target, 'cal-next')){
                    o.defaultOptions.date.setYear(o.defaultOptions.date.getFullYear()+1);
-                   o.monHolder.firstChild.firstChild.nextSibling.innerHTML = o.defaultOptions.date.getFullYear() + '年';
+                   o.monHolder.firstChild.firstChild.nextSibling.nextSibling.innerHTML = o.defaultOptions.date.getFullYear();
                }
             }
             utils.dom.stopPropagation(event);
