@@ -138,6 +138,9 @@ var Dialog = (function(){
       getBtnId : function(){
           return 'btn-' + (Math.random() * 1000000).toFixed(0);
       },
+      typeIt : function(obj){
+          return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+      },
       extend : function(data, def){
           if (def) {
             for (var key in def) {
@@ -339,6 +342,9 @@ var Dialog = (function(){
 
   //显示对话框
   Dialog.prototype.show = function(){
+     //设置被遮罩的层不能滚动
+     document.body.style.overflow = 'hidden';
+
      mask.style.display = "block";
   };
 
@@ -353,6 +359,9 @@ var Dialog = (function(){
      //隐藏iframe 删除容器
      mask.style.display = 'none';
      container.innerHTML = '';
+
+     //设置被遮罩的层滚动默认
+     document.body.style.overflow = 'auto';
 
      utils.dom.removeEvent(sureBtn, 'click', this.options.callbackFuncs.sureFunc);
      utils.dom.removeEvent(cancelBtn, 'click', this.options.callbackFuncs.cancelFunc);
@@ -370,6 +379,9 @@ var Dialog = (function(){
    * isAll是否替换整个模板包含（head和footer）
    */
   Dialog.alert = function(options, cb){
+    if (utils.tools.typeIt(options) == 'string') {
+      options = {msg: options};
+    }
     options = options || {type:"alertTpl"};
     options.type = "alertTpl";
     var dlg = new Dialog(options, cb);
@@ -389,6 +401,9 @@ var Dialog = (function(){
    * isAll是否替换整个模板包含（head和footer）
    */
   Dialog.prompt = function(options, cb){
+    if (utils.tools.typeIt(options) == 'string') {
+      options = {msg: options};
+    }
     options = options || {type:"promptTpl"};
     options.type = "promptTpl";
     var dlg = new Dialog(options, cb);
@@ -414,6 +429,9 @@ var Dialog = (function(){
    * isAll是否替换整个模板包含（head和footer）
    */
   Dialog.confirm = function(options, cb){
+    if (utils.tools.typeIt(options) == 'string') {
+      options = {msg: options};
+    }
     options = options || {type:"confirmTpl"};
     options.type = "confirmTpl";
     var dlg = new Dialog(options, cb);
