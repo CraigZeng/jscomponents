@@ -502,11 +502,8 @@ var Dialog = (function(){
 
     //创建对话框的位控制div
     dlgHolder = document.createElement('div');
-    dlgHolder.style.position = "fixed";
-    dlgHolder.style.width = "100%";
-    dlgHolder.style.zIndex = "10000";
-    dlgHolder.style.display = "none";
-
+    dlgHolder.className = 'dlg-holder';
+    dlgHolder.style.maxHeight = utils.dom.getViewPortSize().height + 'px';
     dlgHolder.appendChild(container);
 
     //初始化mask的大小和屏幕一样高
