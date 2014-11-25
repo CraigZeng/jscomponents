@@ -6,9 +6,6 @@ body{
   margin: 0;
   &.modal{
     padding: 0;
-    .dlg-container{
-      margin: 0 auto;
-    }
   }
 }
 
@@ -64,6 +61,7 @@ body{
     .dlg-prompt-input{
       display: block;
       width: 100%;
+      padding: 0 0.5em;
       height: 2.5em;
       line-height: 0.5em;
       *height: 1.8em;
@@ -72,6 +70,7 @@ body{
       padding-left: 5px;
       outline:none;
       border: solid 1px @gray-color;
+      box-sizing: border-box;
       &:focus,&:active{
         border-color: @primary-color;
       }

@@ -1,6 +1,6 @@
 var Dialog = (function(){
 
-  var mask, container;
+  var mask, container, dlgHolder;
 
   var utils = {
     dom : {
@@ -248,7 +248,7 @@ var Dialog = (function(){
    * dataIds container要取出的数据的id数组
    */
   var getContainerData = function(dataIds){
-    var doc = mask.contentWindow.document;
+    var doc = document;
     var i, len, id, data = {};
     if (dataIds){
       for (i = 0, len = dataIds.length; i < len; i++) {
@@ -264,7 +264,7 @@ var Dialog = (function(){
    */
   var bindEvents = function(cb){
     var that = this;
-    var doc = mask.contentWindow.document;
+    var doc = document;
     var sureBtn = doc.getElementById(this.options.sureBtnId);
     var cancelBtn = doc.getElementById(this.options.cancelBtnId);
     var closeBtn = doc.getElementById(this.options.closeBtnId);
@@ -314,18 +314,13 @@ var Dialog = (function(){
 
     //是否模态框显示
     var size = utils.dom.getViewPortSize();
+    var doc = document;
     if (!options.isModal) {
       setTimeout(function(){
-        var doc = mask.contentWindow.document;
-        doc.body.className = 'modal';
-        mask.style.width = (options.width + 6) + 'px';
-        mask.style.height =  (doc.body.children[0].scrollHeight + 6) + 'px';
-        mask.style.left = (size.width - options.width - 6)/2 + 'px';
-        mask.style.top = '100px'
+        mask.style.display = 'none';
       });
     } else {
       setTimeout(function(){
-        var doc = mask.contentWindow.document;
         doc.body.className = '';
         mask.style.width = '100%';
         mask.style.height =  size.width + 'px';
@@ -346,18 +341,20 @@ var Dialog = (function(){
      document.body.style.overflow = 'hidden';
 
      mask.style.display = "block";
+     dlgHolder.style.display = "block";
   };
 
   //销毁对话框
   Dialog.prototype.destroy = function(){
      //删除事件绑定
-     var doc = mask.contentWindow.document;
+     var doc = document;
      var sureBtn = doc.getElementById(this.options.sureBtnId);
      var cancelBtn = doc.getElementById(this.options.cancelBtnId);
      var closeBtn = doc.getElementById(this.options.closeBtnId);
 
      //隐藏iframe 删除容器
      mask.style.display = 'none';
+     dlgHolder.style.display = 'none';
      container.innerHTML = '';
 
      //设置被遮罩的层滚动默认
@@ -476,6 +473,9 @@ var Dialog = (function(){
   Dialog.utils = utils;
 
   setTimeout(function(){
+    //导入对话框样式
+    utils.dom.importStyle('dialog.css');
+
     //设置mask样式
     utils.dom.addStyle('.dialogMaskFrame{' +
       'position: fixed;' +
@@ -486,7 +486,7 @@ var Dialog = (function(){
       'width: 100%;' +
       'left: 0;' +
       'top: 0;' +
-      'z-index: 100;}');
+      'z-index: 1000;}');
 
     //创建iframe并保存在mask中
     mask = utils.dom.createIframe('dialogMaskFrame');
@@ -500,15 +500,19 @@ var Dialog = (function(){
     mask.setAttribute("frameborder", "0", 0);
     mask.setAttribute("allowtransparency", "true");
 
+    //创建对话框的位控制div
+    dlgHolder = document.createElement('div');
+    dlgHolder.style.position = "fixed";
+    dlgHolder.style.width = "100%";
+    dlgHolder.style.zIndex = "10000";
+    dlgHolder.style.display = "none";
+
+    dlgHolder.appendChild(container);
+
     //初始化mask的大小和屏幕一样高
     mask.style.height = utils.dom.getViewPortSize().height + 'px';
-    mask.onload= function(){
-      //添加对话框容器到dom
-      mask.contentWindow.document.body.appendChild(container);
-      //加载对话框里面的样式
-      utils.dom.importStyle('dialog.css', mask.contentWindow.document);
-    }
 
+    document.body.appendChild(dlgHolder);
     document.body.appendChild(mask);
   }, 0);
 
