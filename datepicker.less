@@ -86,8 +86,20 @@
 				background-color: #fff;
 			}
 		}
+		&.cal-today{
+			background-color:  lighten(@theme-color, 5%);
+			color: #fff;
+			&.cal-selected{
+	   			background-color:  @theme-color;
+				color: #fff;
+		    }
+		}
 		&.cal-disabled{
 			&:hover{
+				color: @disable-color;
+			    cursor: not-allowed;
+			}
+			&.cal-today{
 				color: @disable-color;
 			    cursor: not-allowed;
 			}

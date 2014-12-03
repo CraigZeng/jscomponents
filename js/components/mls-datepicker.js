@@ -169,6 +169,9 @@ var Datepicker = (function(){
         var lastDayOfMonth = new Date(year, month+1, 0);
         var lastDayofLastMonth = new Date(year, month, 0);
         var firstDayOfNextMonth = new Date(year, month+1, 1);
+        var now = new Date();
+        var today = now.getFullYear() === year && now.getMonth() === month;
+        var todayDate = now.getDate();
         var emptyFirstTD = firstDayOfMonth.getDay(), emptyLastTD = lastDayOfMonth.getDay();
         var startDate = 1, endDate = lastDayOfMonth.getDate();
         var tr = '', start, end, tdCls, weekend = 0;
@@ -180,6 +183,7 @@ var Datepicker = (function(){
                 tdCls = 'cal-day';
                 if (start >= startDate && start <= endDate) {
                     if(hilightSelected && start === selectedDate){ tdCls += ' cal-selected'; }
+                    if(today && todayDate === start){tdCls += ' cal-today';}
                     if(weekend%7 === 0 || weekend%7 === 6 ){ tdCls += ' cal-weekend'; }
                     if(!this.defaultOptions.limit(year, month, start)){ tdCls += ' cal-disabled';}
                     tr = tr + '<td class="' + tdCls +'">' + start + '</td>';
