@@ -331,13 +331,20 @@ var Datepicker = (function(){
         });
 
         if (o.defaultOptions.hasTime) {
-            utils.dom.addEvent(o.dayHolder, 'keydown', function(event){
+            utils.dom.addEvent(o.dayHolder, 'keydown', function(event) {
                 event = event || window.event;
+                var target = event.target || event.srcElement;
                 if (event.keyCode === 13) {
-                    updateSelected.apply(o);
-                    updateInput.call(o);
-                    o.fire('selected', o.defaultOptions.selected);
-                    o.hide();
+                  updateSelected.apply(o);
+                  updateInput.call(o);
+                  o.fire('selected', o.defaultOptions.selected);
+                  o.hide();
+                } else if(event.keyCode >= 48 && event.keyCode <= 57){
+                  if(target.innerHTML.replace(/^\s+/g,'').replace(/\s+$/g,'').length >=2){
+                    utils.dom.preventDefault(event);
+                  }
+                } else if(event.keyCode != 8 && event.keyCode != 9 && (event.keyCode < 37 || event.keyCode > 40)){
+                  utils.dom.preventDefault(event);
                 }
             });
         }
