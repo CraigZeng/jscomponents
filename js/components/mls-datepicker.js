@@ -265,9 +265,9 @@ var Datepicker = (function(){
     var getTimeFromEle = function(){
         var time = {},
             holder = this.dayHolder.children[2];
-        time.hours = +holder.children[0].innerHTML;
-        time.minutes = +holder.children[1].innerHTML;
-        time.seconds = +holder.children[2].innerHTML;
+        time.hours = +holder.children[0].innerHTML || 0;
+        time.minutes = +holder.children[1].innerHTML || 0;
+        time.seconds = +holder.children[2].innerHTML || 0;
         return time;
     };
 
@@ -346,9 +346,21 @@ var Datepicker = (function(){
                 } else if(event.keyCode >= 48 && event.keyCode <= 57){
                   if(target.innerHTML.replace(/^\s+/g,'').replace(/\s+$/g,'').length >=2){
                     utils.dom.preventDefault(event);
+                  } else {
+                    setTimeout(function(){
+                        updateSelected.apply(o);
+                        updateInput.call(o);
+                    })
                   }
                 } else if(event.keyCode != 8 && event.keyCode != 9 && (event.keyCode < 37 || event.keyCode > 40)){
                   utils.dom.preventDefault(event);
+                } else if(event.keyCode == 8){
+                  if(target.innerHTML.replace(/^\s+/g,'').replace(/\s+$/g,'').length > 1){
+                    setTimeout(function(){
+                        updateSelected.apply(o);
+                        updateInput.call(o);
+                    })
+                  }
                 }
             });
         }
