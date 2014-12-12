@@ -265,10 +265,11 @@ var Dialog = (function(){
    */
   var renderTpl = function(tmpl, data){
     var id = "";
+    renderTpl.cache = renderTpl.cache || {};
     if(tmpl.indexOf('id:') === 0) {
       id = tmpl.substring(3);
       tmpl = document.getElementById(id).innerHTML;
-      renderTpl.cache[id] = compile(tmpl);
+      renderTpl.cache[id] = renderTpl.cache[id] || compile(tmpl);
       return renderTpl.cache[id].call(data);
     } else {
       return compile(tmpl).call(data);
