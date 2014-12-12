@@ -203,9 +203,9 @@ var Dialog = (function(){
    * DEFAULT_HEADER 默认头部模板
    * DEFAULT_FOOTER 默认底部模板
    */
-  var DEFAULT_HEADER = '<div class="dlg-header"><span class="dlg-close-btn" id="{{closeBtnId}}">&times</span><span class="dlg-title">{{title}}</span></div>',
+  var DEFAULT_HEADER = '<div class="dlg-header"><span class="dlg-close-btn" id="<?= closeBtnId ?>">&times</span><span class="dlg-title"><?= title ?> </span></div>',
 
-      DEFAULT_FOOTER = '<div class="dlg-footer"><button id="{{sureBtnId}}" class="dlg-sure dlg-btn">确&nbsp;&nbsp;定</button><button class="dlg-cancel dlg-btn" id="{{cancelBtnId}}">取&nbsp;&nbsp;消</button></div>';
+      DEFAULT_FOOTER = '<div class="dlg-footer"><button id="<?= sureBtnId ?>" class="dlg-sure dlg-btn">确&nbsp;&nbsp;定</button><button class="dlg-cancel dlg-btn" id="<?= cancelBtnId ?>">取&nbsp;&nbsp;消</button></div>';
 
   /**
    *
@@ -227,19 +227,52 @@ var Dialog = (function(){
     isAll: false,
     msg: "",
     defaultInputId: "defaultInput",
-    alertTpl : '<div class="dlg-content">{{msg}}</div>',
-    promptTpl : '<div class="dlg-content"><div class="dlg-prompt-tip">{{msg}}</div><div class="dlg-prompt-input-wrap"><input type="text" id="{{defaultInputId}}" class="dlg-prompt-input"/></div></div>',
-    confirmTpl : '<div class="dlg-content">{{msg}}</div>'
+    alertTpl : '<div class="dlg-content"><?= msg ?> </div>',
+    promptTpl : '<div class="dlg-content"><div class="dlg-prompt-tip"><?= msg ?> </div><div class="dlg-prompt-input-wrap"><input type="text" id="<?= defaultInputId ?>" class="dlg-prompt-input"/></div></div>',
+    confirmTpl : '<div class="dlg-content"><?= msg ?> </div>'
   };
+
+  /**
+   * 编译模板
+   * template 待编译的模板的html
+   */
+  var compile = function(template){
+    var length = template.length;
+    var outputStr = 'with(this){var result = "";';
+    var tokenReg = /<\?(.*?[^#])\?>/g;
+    var start = 0, end = 0;
+    var dealJsStr = function(str){
+      var firstChar = str.charAt(0);
+      if (firstChar == '=') {
+        return 'result = result + (' + str.substring(1).replace(/^\s+/g, '').replace(/\s+$/g, '') + ');';
+      }
+      return str;
+    };
+    template.replace(tokenReg, function(matchStr, groupStr, matchPos){
+      end = matchPos;
+      outputStr = outputStr + 'result = result + \'' + template.substring(start, end) + '\';';
+      outputStr = outputStr + dealJsStr(groupStr);
+      console.log(outputStr)
+      start = end + matchStr.length;
+    });
+    outputStr = outputStr + 'result = result + \'' + template.substring(start) + '\';';
+    return new Function(outputStr + ';return result;}');
+  }
 
   /**
    * tmpl 渲染模板
    * data  待渲染的数据
    */
   var renderTpl = function(tmpl, data){
-    return tmpl.replace(VARIABLE_LABEL_REG, function(str, key){
-      return data[key] || str;
-    });
+    var id = "";
+    if(tmpl.indexOf('id:') === 0) {
+      id = tmpl.substring(3);
+      tmpl = document.getElementById(id).innerHTML;
+      renderTpl.cache[id] = compile(tmpl);
+      return renderTpl.cache[id].call(data);
+    } else {
+      return compile(tmpl).call(data);
+    }
   };
 
 
